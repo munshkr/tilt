@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>zxc</title>
+</head>
+
+<body>
+
+<button id="play" onclick="playResume()">Play</button>
+
+<script type="text/javascript">
+
+var audioCtx = null;
+var oscillator = null;
+var started = false;
+
+function playResume() {
+  var btn = document.getElementById("play");
+  if (!started) {
+    btn.textContent = "Stop";
+    start();
+  } else {
+    btn.textContent = "Play";
+    stop();
+  }
+}
+
+function createOscillator() {
+  // Create Oscillator node
+  oscillator = audioCtx.createOscillator();
+  oscillator.type = 'sawtooth';
+  oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hertz
+  oscillator.connect(audioCtx.destination);
+  return oscillator;
+}
+
+function stop() {
+  oscillator.stop()
+  oscillator = null;
+  started = false;
+}
+
+function start() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  oscillator = createOscillator();
+  oscillator.start();
+  started = true;
+}
+
+</script>
+
+</body>
+</html>

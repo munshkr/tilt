@@ -8,12 +8,16 @@
 
 <body>
 
+<h1>zxc</h1>
+<input id="formula" size="80" type="text"
+  value="( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64"
+  onKeyUp="reformulate(this.value)">
 <button id="play" onclick="playResume()">Play</button>
 
 <script type="text/javascript">
 
 var SAMPLES = 4096;
-var GAIN = 0.25; // amplitude of the generated waveform
+var GAIN = 0.25;
 
 var audioCtx = null;
 var oscillator = null;
@@ -21,11 +25,21 @@ var started = false;
 
 var t = 0;
 
-// default generator: noop
-var generator = function(t) { return ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64; }
-//var generator = function(t) { return (   ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7  ); }
-//var generator = function(t) { return Math.sin(t + Math.sin(t/2) * 3*Math.sin(t/500)) }
-//var generator = function(t) { return Math.sin(t) }
+var generator = function(t) { return t; }
+
+function reformulate(v) {
+  try {
+    var t = 0;
+    var s = Math.sin;
+    eval(v);
+    var e = "generator = function (t) { var s = Math.sin; return " + v + "; }";
+    console.log(e);
+    eval(e);
+    document.getElementById('formula').setAttribute('class', '');
+  } catch (e) {
+    document.getElementById('formula').setAttribute('class', 'err');
+  }
+}
 
 function playResume() {
   var btn = document.getElementById("play");
@@ -51,13 +65,12 @@ function createNode() {
       // Loop through the output channels (in this case there is only one)
       for (var channel = 0; channel < outputBuffer.numberOfChannels; channel++) {
         var outputData = outputBuffer.getChannelData(channel);
-        //outputData[sample] = GAIN * ((mask & generator(t)) / div - 1);
-        outputData[sample] = GAIN * generator(t/16);
+        outputData[sample] = GAIN * generator(t / 16);
       }
 
       t++;
     }
-    console.log(t)
+    //console.log(t)
   }
 
   node.connect(audioCtx.destination);
@@ -74,6 +87,8 @@ function start() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
+  var formula = document.getElementById('formula').value;
+  reformulate(formula);
   node = createNode();
   started = true;
 }

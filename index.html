@@ -12,9 +12,20 @@
 
 <script type="text/javascript">
 
+var SAMPLES = 4096;
+var GAIN = 0.25; // amplitude of the generated waveform
+
 var audioCtx = null;
 var oscillator = null;
 var started = false;
+
+var t = 0;
+
+// default generator: noop
+var generator = function(t) { return ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64; }
+//var generator = function(t) { return (   ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7  ); }
+//var generator = function(t) { return Math.sin(t + Math.sin(t/2) * 3*Math.sin(t/500)) }
+//var generator = function(t) { return Math.sin(t) }
 
 function playResume() {
   var btn = document.getElementById("play");
@@ -27,18 +38,35 @@ function playResume() {
   }
 }
 
-function createOscillator() {
-  // Create Oscillator node
-  oscillator = audioCtx.createOscillator();
-  oscillator.type = 'sawtooth';
-  oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // value in hertz
-  oscillator.connect(audioCtx.destination);
-  return oscillator;
+function createNode() {
+  var node = audioCtx.createScriptProcessor(0, 0, 2);
+  console.log("Buffer size: " + node.bufferSize);
+
+  node.onaudioprocess = function(audioProcessingEvent) {
+    // The output buffer contains the samples that will be modified and played
+    var outputBuffer = audioProcessingEvent.outputBuffer;
+
+    // Loop through the 4096 samples
+    for (var sample = 0; sample < node.bufferSize; sample++) {
+      // Loop through the output channels (in this case there is only one)
+      for (var channel = 0; channel < outputBuffer.numberOfChannels; channel++) {
+        var outputData = outputBuffer.getChannelData(channel);
+        //outputData[sample] = GAIN * ((mask & generator(t)) / div - 1);
+        outputData[sample] = GAIN * generator(t/16);
+      }
+
+      t++;
+    }
+    console.log(t)
+  }
+
+  node.connect(audioCtx.destination);
+  return node;
 }
 
 function stop() {
-  oscillator.stop()
-  oscillator = null;
+  node.disconnect(audioCtx.destination);
+  node = null;
   started = false;
 }
 
@@ -46,8 +74,7 @@ function start() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  oscillator = createOscillator();
-  oscillator.start();
+  node = createNode();
   started = true;
 }
 

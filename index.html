@@ -31,12 +31,14 @@ function reformulate(v) {
   try {
     var t = 0;
     var s = Math.sin;
+    var x = Math.random;
     eval(v);
-    var e = "generator = function (t) { var s = Math.sin; return " + v + "; }";
+    var e = "generator = function (t) { var s = Math.sin; var x = Math.random(); return " + v + "; }";
     console.log(e);
     eval(e);
     document.getElementById('formula').setAttribute('class', '');
   } catch (e) {
+    console.log(e);
     document.getElementById('formula').setAttribute('class', 'err');
   }
 }
@@ -57,17 +59,13 @@ function createNode() {
   console.log("Buffer size: " + node.bufferSize);
 
   node.onaudioprocess = function(audioProcessingEvent) {
-    // The output buffer contains the samples that will be modified and played
     var outputBuffer = audioProcessingEvent.outputBuffer;
 
-    // Loop through the 4096 samples
     for (var sample = 0; sample < node.bufferSize; sample++) {
-      // Loop through the output channels (in this case there is only one)
       for (var channel = 0; channel < outputBuffer.numberOfChannels; channel++) {
         var outputData = outputBuffer.getChannelData(channel);
         outputData[sample] = GAIN * generator(t / 16);
       }
-
       t++;
     }
     //console.log(t)

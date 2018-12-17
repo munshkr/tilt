@@ -12,9 +12,10 @@
   "author": "Damián Silvani",
   "license": "GPL-3.0+",
   "dependencies": {
+    "@zeit/next-css": "^1.0.1",
     "next": "^7.0.2",
     "react": "^16.6.3",
-    "react-codemirror": "^1.0.0",
+    "react-ace": "^6.2.0",
     "react-dom": "^16.6.3"
   }
 }

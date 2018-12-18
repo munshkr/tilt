@@ -34,7 +34,7 @@ class Editor extends React.Component {
   };
 
   render() {
-    const { onEval, children } = this.props;
+    const { onEval, onStop, children } = this.props;
     const { content } = this.state;
 
     return (
@@ -55,6 +55,11 @@ class Editor extends React.Component {
             name: "evaluate",
             bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
             exec: onEval
+          },
+          {
+            name: "stop",
+            bindKey: { win: "Ctrl-.", mac: "Command-." },
+            exec: onStop
           }
         ]}
       />

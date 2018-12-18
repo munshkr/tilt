@@ -14,6 +14,7 @@ class Index extends React.Component {
     super(props);
     this._synth = new Synth();
     this._onEval = this._onEval.bind(this);
+    this._onStop = this._onStop.bind(this);
   }
 
   _tryEval(content) {
@@ -47,10 +48,19 @@ class Index extends React.Component {
     }
   }
 
+  _onStop() {
+    console.log("Hush!");
+    this._synth.stop();
+  }
+
   render() {
     return (
       <div>
-        <Editor onEval={this._onEval} defaultContent={DEFAULT_CONTENT} />
+        <Editor
+          onEval={this._onEval}
+          onStop={this._onStop}
+          defaultContent={DEFAULT_CONTENT}
+        />
       </div>
     );
   }

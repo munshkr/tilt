@@ -1,5 +1,6 @@
 class Synth {
   constructor() {
+    this.isPlaying = false;
     this.audioCtx = null;
     this.t = 0;
     this.gain = 0.25;
@@ -7,16 +8,20 @@ class Synth {
   }
 
   play() {
-    this._initialize();
-    this.node.connect(this.audioCtx.destination);
-    console.log("play");
+    if (!this.isPlaying) {
+      this._initialize();
+      this.node.connect(this.audioCtx.destination);
+      this.isPlaying = true;
+      console.log("play");
+    }
   }
 
   stop() {
-    if (this.node) {
+    if (this.isPlaying) {
       this.node.disconnect(this.audioCtx.destination);
+      this.isPlaying = false;
+      console.log("stop");
     }
-    console.log("stop");
   }
 
   _initialize() {

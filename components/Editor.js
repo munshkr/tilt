@@ -5,7 +5,8 @@ import "brace/theme/github";
 
 const style = {
   width: "100vw",
-  height: "100vh"
+  height: "100vh",
+  backgroundColor: "transparent"
 };
 
 class Editor extends React.Component {
@@ -34,7 +35,7 @@ class Editor extends React.Component {
   };
 
   render() {
-    const { onEval, onStop, children } = this.props;
+    const { onEval, onStop } = this.props;
     const { content } = this.state;
 
     return (

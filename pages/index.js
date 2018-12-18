@@ -1,7 +1,8 @@
 import React from "react";
 import dynamic from "next/dynamic";
 
-import Synth from "../components/Synth";
+import SynthController from "../components/SynthController";
+//import Oscilloscope from "../components/Oscilloscope";
 
 const Editor = dynamic(() => import("../components/Editor"), { ssr: false });
 
@@ -10,9 +11,13 @@ o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 `;
 
 class Index extends React.Component {
+  state = {
+    audioContext: null,
+    generator: null
+  };
+
   constructor(props) {
     super(props);
-    this._synth = new Synth();
     this._onEval = this._onEval.bind(this);
     this._onStop = this._onStop.bind(this);
   }
@@ -31,29 +36,44 @@ class Index extends React.Component {
     }
   }
 
+  play() {
+    let { audioContext } = this.state;
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    this.setState({ audioContext: audioContext, isPlaying: true });
+  }
+
+  stop() {
+    this.setState({ isPlaying: false });
+  }
+
   _onEval(editor) {
     console.log("Evaluate!");
     const content = editor.getValue();
     if (this._tryEval(content)) {
-      let synth = this._synth;
-      eval(`synth.generator = function(t) {
+      var generator = null;
+      eval(`generator = function(t) {
             var o = 0;
             var s = Math.sin;
             var x = Math.random();
             ${content};
             return o;
         }`);
-      console.log(synth.generator);
-      synth.play();
+      console.log(`generator: ${generator}`);
+      this.setState({ generator: generator });
+      this.play();
     }
   }
 
   _onStop() {
     console.log("Hush!");
-    this._synth.stop();
+    this.stop();
   }
 
   render() {
+    const { audioContext, isPlaying, generator } = this.state;
+
     return (
       <div>
         <Editor
@@ -61,6 +81,20 @@ class Index extends React.Component {
           onStop={this._onStop}
           defaultContent={DEFAULT_CONTENT}
         />
+        <SynthController
+          audioContext={audioContext}
+          isPlaying={isPlaying}
+          generator={generator}
+        />
+        {/*<Oscilloscope audioContext={audioContext}>
+        </Oscilloscope>*/}
+        <style global jsx>
+          {`
+            body {
+              background-color: transparent;
+            }
+          `}
+        </style>
       </div>
     );
   }

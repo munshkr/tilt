@@ -1,16 +1,16 @@
 class Synth {
-  constructor() {
+  constructor(audioContext) {
     this.isPlaying = false;
-    this.audioCtx = null;
-    this.t = 0;
+    this.audioContext = audioContext;
     this.gain = 0.25;
+    this.t = 0;
     this.generator = t => t;
   }
 
   play() {
     if (!this.isPlaying) {
       this._initialize();
-      this.node.connect(this.audioCtx.destination);
+      this.node.connect(this.audioContext.destination);
       this.isPlaying = true;
       console.log("play");
     }
@@ -18,16 +18,15 @@ class Synth {
 
   stop() {
     if (this.isPlaying) {
-      this.node.disconnect(this.audioCtx.destination);
+      this.node.disconnect(this.audioContext.destination);
       this.isPlaying = false;
       console.log("stop");
     }
   }
 
   _initialize() {
-    if (!this.audioCtx) {
-      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      this.node = this.audioCtx.createScriptProcessor(0, 0, 2);
+    if (!this.node && this.audioContext) {
+      this.node = this.audioContext.createScriptProcessor(0, 0, 2);
       this.node.onaudioprocess = event => this._onAudioProcess(event);
     }
   }

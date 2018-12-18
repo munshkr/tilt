@@ -16,19 +16,35 @@ class Index extends React.Component {
     this._onEval = this._onEval.bind(this);
   }
 
+  _tryEval(content) {
+    try {
+      var t = 0;
+      var o = 0;
+      var s = Math.sin;
+      var x = Math.random();
+      eval(content);
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
   _onEval(editor) {
     console.log("Evaluate!");
     const content = editor.getValue();
-    let synth = this._synth;
-    eval(`synth.generator = function(t) {
-        var o = 0;
-        var s = Math.sin;
-        var x = Math.random();
-        ${content};
-        return o;
-    }`);
-    console.log(synth.generator);
-    synth.play();
+    if (this._tryEval(content)) {
+      let synth = this._synth;
+      eval(`synth.generator = function(t) {
+            var o = 0;
+            var s = Math.sin;
+            var x = Math.random();
+            ${content};
+            return o;
+        }`);
+      console.log(synth.generator);
+      synth.play();
+    }
   }
 
   render() {

@@ -24,10 +24,13 @@ class Index extends React.Component {
 
   _tryEval(content) {
     try {
+      var K = 8000;
       var t = 0;
       var o = 0;
       var s = Math.sin;
       var x = Math.random();
+      var e = function(subdiv, curve) { return Math.pow(1-t%(K/subdiv)/(K/subdiv), curve) };
+      var i = function(subdiv, curve) { return Math.pow(t%(K/subdiv)/(K/subdiv), curve) };
       eval(content);
       return true;
     } catch (err) {
@@ -54,9 +57,12 @@ class Index extends React.Component {
     if (this._tryEval(content)) {
       var generator = null;
       eval(`generator = function(t) {
+            var K = 8000;
             var o = 0;
             var s = Math.sin;
             var x = Math.random();
+            var e = function(subdiv, curve) { return Math.pow(1-t%(K/subdiv)/(K/subdiv), curve) };
+            var i = function(subdiv, curve) { return Math.pow(t%(K/subdiv)/(K/subdiv), curve) };
             ${content};
             return o;
         }`);

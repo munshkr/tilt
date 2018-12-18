@@ -3,7 +3,7 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 
 import SynthController from "../components/SynthController";
-//import Oscilloscope from "../components/Oscilloscope";
+import Oscilloscope from "../components/Oscilloscope";
 
 const Editor = dynamic(() => import("../components/Editor"), { ssr: false });
 
@@ -38,6 +38,7 @@ class Index extends React.Component {
   };
 
   editorRef = React.createRef();
+  synthRef = React.createRef();
 
   constructor(props) {
     super(props);
@@ -144,12 +145,17 @@ class Index extends React.Component {
           defaultContent={DEFAULT_CONTENT}
         />
         <SynthController
+          ref={this.synthRef}
           audioContext={audioContext}
           isPlaying={isPlaying}
           generator={generator}
         />
         <PlayButton onClick={this._onPlayButtonClick} isPlaying={isPlaying} />
-
+        <Oscilloscope
+          audioContext={audioContext}
+          synthRef={this.synthRef}
+          isPlaying={isPlaying}
+        />
         <style global jsx>
           {`
             body {

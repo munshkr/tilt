@@ -22,6 +22,18 @@ class SynthController extends React.Component {
     }
   }
 
+  connectToSynth(node) {
+    if (this.synth) {
+      this.synth.node.connect(node);
+    }
+  }
+
+  disconnectFromSynth(node) {
+    if (this.synth) {
+      this.synth.node.disconnect(node);
+    }
+  }
+
   render() {
     return null;
   }

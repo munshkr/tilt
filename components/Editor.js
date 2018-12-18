@@ -14,7 +14,7 @@ class Editor extends React.Component {
     content: ""
   };
 
-  componentDidMount() {
+  componentWillMount() {
     let content = this._getLastContent();
     if (!content) {
       content = this.props.defaultContent;
@@ -32,6 +32,7 @@ class Editor extends React.Component {
 
   _onChange = text => {
     this._setLastContent(text);
+    this.setState({ content: text });
   };
 
   render() {

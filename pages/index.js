@@ -1,4 +1,5 @@
 import React from "react";
+import Head from "next/head";
 import dynamic from "next/dynamic";
 
 import SynthController from "../components/SynthController";
@@ -31,9 +32,12 @@ class Index extends React.Component {
       var K = 8192;
       var o = 0;
       var s = Math.sin;
-      var e = (subdiv, curve) => Math.pow(1-t%(K/subdiv)/(K/subdiv), curve);
-      var i = (subdiv, curve) => Math.pow(t%(K/subdiv)/(K/subdiv), curve);
-      var S = (subdiv, longitud) => Math.floor(1+(t/(K/subdiv)%(longitud)));
+      var e = (subdiv, curve) =>
+        Math.pow(1 - (t % (K / subdiv)) / (K / subdiv), curve);
+      var i = (subdiv, curve) =>
+        Math.pow((t % (K / subdiv)) / (K / subdiv), curve);
+      var S = (subdiv, longitud) =>
+        Math.floor(1 + ((t / (K / subdiv)) % longitud));
       eval(content);
       return true;
     } catch (err) {
@@ -85,6 +89,12 @@ class Index extends React.Component {
 
     return (
       <div>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <meta charSet="utf-8" />
+          <title>Tilt</title>
+        </Head>
+
         <Editor
           onEval={this._onEval}
           onStop={this._onStop}
@@ -95,8 +105,7 @@ class Index extends React.Component {
           isPlaying={isPlaying}
           generator={generator}
         />
-        {/*<Oscilloscope audioContext={audioContext}>
-        </Oscilloscope>*/}
+
         <style global jsx>
           {`
             body {

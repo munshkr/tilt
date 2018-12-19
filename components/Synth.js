@@ -3,8 +3,10 @@ class Synth {
     this.isPlaying = false;
     this.audioContext = audioContext;
     this.gain = 0.25;
+    this.K = 8192;
     this.t = 0;
-    this.generator = t => t;
+    this.x = Math.random();
+    this.generator = (t, x) => t;
   }
 
   play() {
@@ -37,9 +39,12 @@ class Synth {
     for (var s = 0; s < this.node.bufferSize; s++) {
       for (var c = 0; c < outputBuffer.numberOfChannels; c++) {
         var outputData = outputBuffer.getChannelData(c);
-        outputData[s] = this.gain * this.generator(this.t / 16);
+        outputData[s] = this.gain * this.generator(this.t / 16, this.x);
       }
       this.t++;
+      if (this.t % this.K == 0) {
+        this.x = Math.random()
+      }
     }
   }
 }

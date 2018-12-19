@@ -24,13 +24,16 @@ class Index extends React.Component {
 
   _tryEval(content) {
     try {
-      var K = 8000;
+      // parameters
       var t = 0;
+      var x = 0;
+      // global variables and functions
+      var K = 8192;
       var o = 0;
       var s = Math.sin;
-      var x = Math.random();
-      var e = function(subdiv, curve) { return Math.pow(1-t%(K/subdiv)/(K/subdiv), curve) };
-      var i = function(subdiv, curve) { return Math.pow(t%(K/subdiv)/(K/subdiv), curve) };
+      var e = (subdiv, curve) => Math.pow(1-t%(K/subdiv)/(K/subdiv), curve);
+      var i = (subdiv, curve) => Math.pow(t%(K/subdiv)/(K/subdiv), curve);
+      var S = (subdiv, longitud) => Math.floor(1+(t/(K/subdiv)%(longitud)));
       eval(content);
       return true;
     } catch (err) {
@@ -56,13 +59,13 @@ class Index extends React.Component {
     const content = editor.getValue();
     if (this._tryEval(content)) {
       var generator = null;
-      eval(`generator = function(t) {
-            var K = 8000;
+      eval(`generator = function(t, x) {
+            var K = 8192;
             var o = 0;
             var s = Math.sin;
-            var x = Math.random();
-            var e = function(subdiv, curve) { return Math.pow(1-t%(K/subdiv)/(K/subdiv), curve) };
-            var i = function(subdiv, curve) { return Math.pow(t%(K/subdiv)/(K/subdiv), curve) };
+            var e = (subdiv, curve) => Math.pow(1-t%(K/subdiv)/(K/subdiv), curve);
+            var i = (subdiv, curve) => Math.pow(t%(K/subdiv)/(K/subdiv), curve);
+            var S = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
             ${content};
             return o;
         }`);

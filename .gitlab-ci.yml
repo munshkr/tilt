@@ -1,0 +1,9 @@
+pages:
+  stage: out
+  script:
+  - yarn export
+  artifacts:
+    paths:
+    - out
+  only:
+  - master

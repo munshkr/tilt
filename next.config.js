@@ -1,6 +1,7 @@
 const withCSS = require("@zeit/next-css");
 
 module.exports = withCSS({
+  assetPrefix: process.env.NODE_ENV === "production" ? "/tilt" : "",
   webpack: function(config) {
     config.module.rules.push({
       test: /\.(eot|woff|woff2|ttf|svg|png|jpg|gif)$/,

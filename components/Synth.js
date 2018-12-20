@@ -3,7 +3,7 @@ class Synth {
     this.isPlaying = false;
     this.audioContext = audioContext;
 
-    this.K = 8192;
+    this.K = null;
     this.gain = 0.25;
     this.r = 1;
     this.t = 0;
@@ -31,6 +31,10 @@ class Synth {
 
   _initialize() {
     if (!this.node && this.audioContext) {
+      if (this.K === null) {
+        this.K = (this.audioContext.sampleRate / 4) * this.r;
+        console.log(`K = ${this.K}`);
+      }
       this.node = this.audioContext.createScriptProcessor(0, 0, 2);
       this.node.onaudioprocess = event => this._onAudioProcess(event);
     }

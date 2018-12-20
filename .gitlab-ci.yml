@@ -1,5 +1,5 @@
 pages:
-  stage: out
+  stage: deploy
   script:
   - yarn export
   artifacts:

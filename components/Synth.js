@@ -1,16 +1,15 @@
 class Synth {
-  K = 8192;
-
   constructor(audioContext) {
     this.isPlaying = false;
     this.audioContext = audioContext;
 
+    this.K = 8192;
     this.gain = 0.25;
     this.r = 1;
     this.t = 0;
     this.x = Math.random();
 
-    this.generator = (t, x) => [0, this.r];
+    this.generator = (t, x, r, K) => [0, r, K];
   }
 
   play() {
@@ -38,26 +37,27 @@ class Synth {
   }
 
   _onAudioProcess(event) {
-    var outputBuffer = event.outputBuffer;
+    let outputBuffer = event.outputBuffer;
 
-    for (var s = 0; s < this.node.bufferSize; s++) {
-      var realFreq = 440 * this.r;
-      var angularFreq = realFreq * 2 * Math.PI;
+    for (let s = 0; s < this.node.bufferSize; s++) {
+      const realFreq = 440 * this.r;
+      const angularFreq = realFreq * 2 * Math.PI;
 
       // Calculate value for generator
-      var sampleTime = this.t / this.audioContext.sampleRate;
-      var sampleAngle = sampleTime * angularFreq;
+      const sampleTime = this.t / this.audioContext.sampleRate;
+      const sampleAngle = sampleTime * angularFreq;
 
       // Set current sample on all channels
       for (var c = 0; c < outputBuffer.numberOfChannels; c++) {
-        var outputData = outputBuffer.getChannelData(c);
+        let outputData = outputBuffer.getChannelData(c);
 
         // Generate sample
-        var [o, r] = this.generator(sampleAngle, this.x);
+        const [o, r, K] = this.generator(sampleAngle, this.x, this.r, this.K);
         outputData[s] = this.gain * o;
 
         // Update other state variables
         this.r = r;
+        this.K = K;
       }
 
       // Increment counter

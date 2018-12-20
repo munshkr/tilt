@@ -30,6 +30,7 @@ class Index extends React.Component {
       var x = 0;
       // global variables and functions
       var K = 8192;
+      var r = 1;
       var o = 0;
       var s = Math.sin;
       var e = (subdiv, curve) =>
@@ -65,13 +66,14 @@ class Index extends React.Component {
       var generator = null;
       eval(`generator = function(t, x) {
             var K = 8192;
+            var r = 1;
             var o = 0;
             var s = Math.sin;
             var e = (subdiv, curve) => Math.pow(1-t%(K/subdiv)/(K/subdiv), curve);
             var i = (subdiv, curve) => Math.pow(t%(K/subdiv)/(K/subdiv), curve);
             var S = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
             ${content};
-            return o;
+            return [o, r];
         }`);
       console.log(`generator: ${generator}`);
       this.setState({ generator: generator });

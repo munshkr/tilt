@@ -13,7 +13,7 @@ o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 
 const PlayButton = ({ onClick }) => (
   <div>
-    <img src="/static/play.svg" onClick={onClick} />
+    <img src="static/play.svg" onClick={onClick} />
     <style jsx>{`
       img {
         position: absolute;

@@ -110,6 +110,7 @@ class Index extends React.Component {
           {`
             body {
               background-color: transparent;
+              margin: 0;
             }
           `}
         </style>

@@ -46,7 +46,7 @@ class Index extends React.Component {
     try {
       // parameters
       var t = 0;
-      var K = 8192;
+      var K = 0;
       var r = 1;
       var x = 0;
       // global variables and functions

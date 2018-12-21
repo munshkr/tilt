@@ -6,7 +6,7 @@ class Synth {
     this.audioContext = audioContext;
 
     this.K = null;
-    this.gain = 0.25;
+    this.gain = 0.5;
     this.r = 1;
     this.t = 0;
     this.x = Math.random();

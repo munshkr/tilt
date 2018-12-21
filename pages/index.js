@@ -46,18 +46,15 @@ class Index extends React.Component {
     try {
       // parameters
       var t = 0;
-      var x = 0;
-      var r = 1;
       var K = 8192;
+      var r = 1;
+      var x = 0;
       // global variables and functions
       var o = 0;
       var s = Math.sin;
-      var e = (subdiv, curve) =>
-        Math.pow(1 - (t % (K / subdiv)) / (K / subdiv), curve);
-      var i = (subdiv, curve) =>
-        Math.pow((t % (K / subdiv)) / (K / subdiv), curve);
-      var S = (subdiv, longitud) =>
-        Math.floor(1 + ((t / (K / subdiv)) % longitud));
+      var e = () => null;
+      var i = () => null;
+      var S = () => null;
       eval(content);
       return true;
     } catch (err) {
@@ -84,9 +81,19 @@ class Index extends React.Component {
       eval(`generator = function(t, x, r, K) {
             var o = 0;
             var s = Math.sin;
-            var e = (subdiv, curve) => Math.pow(1-t%(K/subdiv)/(K/subdiv), curve);
-            var i = (subdiv, curve) => Math.pow(t%(K/subdiv)/(K/subdiv), curve);
             var S = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
+            var e = (subdiv, curve, smooth) => {
+              if (!smooth) smooth = 0.05;
+              var tp = t%(K/subdiv)/(K/subdiv);
+              var mult = (tp <= smooth) ? (tp / smooth) : 1;
+              return Math.pow(1-tp, curve) * mult;
+            };
+            var i = (subdiv, curve, smooth) => {
+              if (!smooth) smooth = 0.05;
+              var tp = t%(K/subdiv)/(K/subdiv);
+              var mult = (tp >= 1-smooth) ? ((1-tp) / smooth) : 1;
+              return Math.pow(tp, curve) * mult;
+            };
             ${content};
             return [o, r, K];
         }`);

@@ -1,3 +1,5 @@
+const BASE_FREQ = 440;
+
 class Synth {
   constructor(audioContext) {
     this.isPlaying = false;
@@ -44,7 +46,7 @@ class Synth {
     let outputBuffer = event.outputBuffer;
 
     for (let s = 0; s < this.node.bufferSize; s++) {
-      const realFreq = 440 * this.r;
+      const realFreq = BASE_FREQ * this.r;
       const angularFreq = realFreq * 2 * Math.PI;
 
       // Calculate value for generator

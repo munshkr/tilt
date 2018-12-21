@@ -11,3 +11,6 @@ bytebeat-inspired live coding thingie
 ## License
 
 GPL 3+. Refer to [LICENSE.txt](LICENSE.txt)
+
+Icons:
+* play by Eagle Eye from the Noun Project

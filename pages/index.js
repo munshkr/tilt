@@ -11,16 +11,35 @@ const DEFAULT_CONTENT = `// Define variable o to set audio output, like this:
 o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 `;
 
+const PlayButton = ({ onClick }) => (
+  <div>
+    <img src="/static/play.svg" onClick={onClick} />
+    <style jsx>{`
+      img {
+        position: absolute;
+        right: 1.5em;
+        top: 1em;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+      }
+    `}</style>
+  </div>
+);
+
 class Index extends React.Component {
   state = {
     audioContext: null,
     generator: null
   };
 
+  editorRef = React.createRef();
+
   constructor(props) {
     super(props);
     this._onEval = this._onEval.bind(this);
     this._onStop = this._onStop.bind(this);
+    this._onPlayButtonClick = this._onPlayButtonClick.bind(this);
   }
 
   _tryEval(content) {
@@ -59,9 +78,7 @@ class Index extends React.Component {
     this.setState({ isPlaying: false });
   }
 
-  _onEval(editor) {
-    console.log("Evaluate!");
-    const content = editor.getValue();
+  eval(content) {
     if (this._tryEval(content)) {
       var generator = null;
       eval(`generator = function(t, x, r, K) {
@@ -79,9 +96,19 @@ class Index extends React.Component {
     }
   }
 
+  _onEval(editor) {
+    const content = editor.getValue();
+    this.eval(content);
+  }
+
   _onStop() {
-    console.log("Hush!");
     this.stop();
+  }
+
+  _onPlayButtonClick() {
+    const editor = this.editorRef.current.editor;
+    const content = editor.getValue();
+    this.eval(content);
   }
 
   render() {
@@ -96,6 +123,7 @@ class Index extends React.Component {
         </Head>
 
         <Editor
+          editorRef={this.editorRef}
           onEval={this._onEval}
           onStop={this._onStop}
           defaultContent={DEFAULT_CONTENT}
@@ -105,6 +133,7 @@ class Index extends React.Component {
           isPlaying={isPlaying}
           generator={generator}
         />
+        <PlayButton onClick={this._onPlayButtonClick} />
 
         <style global jsx>
           {`

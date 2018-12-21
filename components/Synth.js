@@ -33,7 +33,7 @@ class Synth {
     if (!this.node && this.audioContext) {
       if (this.K === null) {
         this.K = (this.audioContext.sampleRate / 4) * this.r;
-        console.log(`K = ${this.K}`);
+        //console.log(`K = ${this.K}`);
       }
       this.node = this.audioContext.createScriptProcessor(0, 0, 2);
       this.node.onaudioprocess = event => this._onAudioProcess(event);
@@ -68,8 +68,9 @@ class Synth {
       this.t++;
 
       // Reset random variable
-      if (this.t % this.K == 0) {
+      if (this.t % this.K === 0) {
         this.x = Math.random();
+        //console.log(`t == ${this.t}, K = ${this.K}, this.x = ${this.x}`);
       }
     }
   }

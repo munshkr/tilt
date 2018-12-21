@@ -36,11 +36,12 @@ class Editor extends React.Component {
   };
 
   render() {
-    const { onEval, onStop } = this.props;
+    const { editorRef, onEval, onStop } = this.props;
     const { content } = this.state;
 
     return (
       <AceEditor
+        ref={editorRef}
         mode="javascript"
         theme="github"
         name="editor"

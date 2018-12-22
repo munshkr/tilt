@@ -46,6 +46,7 @@ class Index extends React.Component {
       var x = 0;
       // global variables and functions
       var o = 0;
+      var pi = Math.PI;
       var sin = Math.sin;
       var abs = Math.abs;
       var floor = Math.floor;
@@ -79,6 +80,7 @@ class Index extends React.Component {
       eval(`generator = function(t, x, r, K) {
             var o = 0;
 
+            var pi = Math.pi;
             var sin = arg => (Math.sin(arg) + 1) / 2;
             var abs = Math.abs;
             var floor = Math.floor;

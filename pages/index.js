@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 
+import Button from "../components/Button";
 import SynthController from "../components/SynthController";
 import Oscilloscope from "../components/Oscilloscope";
 
@@ -10,30 +11,6 @@ const Editor = dynamic(() => import("../components/Editor"), { ssr: false });
 const DEFAULT_CONTENT = `// Define variable o to set audio output, like this:
 o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 `;
-
-const Button = ({ src, disabled, onClick }) => (
-  <div>
-    <div
-      onClick={disabled ? () => null : onClick}
-      className={`button ${disabled ? "disabled" : ""}`}
-    />
-    <style jsx>{`
-      .button {
-        background-color: #000;
-        -webkit-mask: url(${src}) no-repeat center;
-        mask: url(${src}) no-repeat center;
-        -webkit-mask-size: 75%;
-        mask-size: 75%;
-        width: 48px;
-        height: 48px;
-        cursor: pointer;
-      }
-      .button.disabled {
-        background-color: #999;
-      }
-    `}</style>
-  </div>
-);
 
 const PlayButton = props => <Button src={`static/play.svg`} {...props} />;
 const StopButton = props => <Button src={`static/stop.svg`} {...props} />;

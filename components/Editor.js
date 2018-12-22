@@ -47,6 +47,7 @@ class Editor extends React.Component {
         name="editor"
         showGutter={false}
         showPrintMargin={false}
+        wrapEnabled={true}
         fontSize={24}
         focus={true}
         value={content}

@@ -6,7 +6,10 @@ import Button from "../components/Button";
 import SynthController from "../components/SynthController";
 import Oscilloscope from "../components/Oscilloscope";
 
-const Editor = dynamic(() => import("../components/Editor"), { ssr: false });
+const Editor = dynamic(() => import("../components/Editor"), {
+  ssr: false,
+  loading: () => <span>Loading...</span>
+});
 
 const DEFAULT_CONTENT = `// Define variable o to set audio output, like this:
 o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64

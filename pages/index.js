@@ -11,25 +11,32 @@ const DEFAULT_CONTENT = `// Define variable o to set audio output, like this:
 o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 `;
 
-const PlayButton = ({ onClick, isPlaying }) => {
-  const imgName = isPlaying ? "stop" : "play";
+const Button = ({ src, disabled, onClick }) => (
+  <div>
+    <div
+      onClick={disabled ? () => null : onClick}
+      className={`button ${disabled ? "disabled" : ""}`}
+    />
+    <style jsx>{`
+      .button {
+        background-color: #000;
+        -webkit-mask: url(${src}) no-repeat center;
+        mask: url(${src}) no-repeat center;
+        -webkit-mask-size: 75%;
+        mask-size: 75%;
+        width: 48px;
+        height: 48px;
+        cursor: pointer;
+      }
+      .button.disabled {
+        background-color: #999;
+      }
+    `}</style>
+  </div>
+);
 
-  return (
-    <div>
-      <img src={`static/${imgName}.svg`} onClick={onClick} />
-      <style jsx>{`
-        img {
-          position: absolute;
-          right: 1.5em;
-          top: 1em;
-          width: 32px;
-          height: 32px;
-          cursor: pointer;
-        }
-      `}</style>
-    </div>
-  );
-};
+const PlayButton = props => <Button src={`static/play.svg`} {...props} />;
+const StopButton = props => <Button src={`static/stop.svg`} {...props} />;
 
 class Index extends React.Component {
   state = {
@@ -45,6 +52,7 @@ class Index extends React.Component {
     this._onEval = this._onEval.bind(this);
     this._onStop = this._onStop.bind(this);
     this._onPlayButtonClick = this._onPlayButtonClick.bind(this);
+    this._onStopButtonClick = this._onStopButtonClick.bind(this);
   }
 
   _tryEval(content) {
@@ -127,13 +135,13 @@ class Index extends React.Component {
   }
 
   _onPlayButtonClick() {
-    if (this.state.isPlaying) {
-      this.stop();
-    } else {
-      const editor = this.editorRef.current.editor;
-      const content = editor.getValue();
-      this.eval(content);
-    }
+    const editor = this.editorRef.current.editor;
+    const content = editor.getValue();
+    this.eval(content);
+  }
+
+  _onStopButtonClick() {
+    this.stop();
   }
 
   render() {
@@ -159,20 +167,28 @@ class Index extends React.Component {
           isPlaying={isPlaying}
           generator={generator}
         />
-        <PlayButton onClick={this._onPlayButtonClick} isPlaying={isPlaying} />
+        <div className="controls">
+          <PlayButton onClick={this._onPlayButtonClick} />
+          <StopButton onClick={this._onStopButtonClick} disabled={!isPlaying} />
+        </div>
         <Oscilloscope
           audioContext={audioContext}
           synthRef={this.synthRef}
           isPlaying={isPlaying}
         />
-        <style global jsx>
-          {`
-            body {
-              background-color: transparent;
-              margin: 0;
-            }
-          `}
-        </style>
+
+        <style global jsx>{`
+          body {
+            background-color: transparent;
+            margin: 0;
+          }
+          .controls {
+            position: absolute;
+            right: 1.5em;
+            bottom: 1em;
+            z-index: 1;
+          }
+        `}</style>
       </div>
     );
   }

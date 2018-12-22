@@ -59,7 +59,7 @@ class Synth {
 
         // Generate sample
         const [o, r, K] = this.generator(sampleAngle, this.x, this.r, this.K);
-        outputData[s] = this.gain * o;
+        outputData[s] = this.gain * (o * 2 - 1);
 
         // Update other state variables
         this.r = r;

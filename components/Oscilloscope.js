@@ -35,7 +35,7 @@ class Oscilloscope extends React.Component {
       ctx.beginPath();
       for (let i = 0; i < waveform.length; i++) {
         const x = i;
-        const y = (0.5 + waveform[i] / 2) * canvas.height;
+        const y = (0.5 - waveform[i] / 2) * canvas.height;
         if (i == 0) {
           ctx.moveTo(x, y);
         } else {

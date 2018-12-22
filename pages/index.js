@@ -56,10 +56,13 @@ class Index extends React.Component {
       var x = 0;
       // global variables and functions
       var o = 0;
-      var s = Math.sin;
-      var e = () => null;
-      var i = () => null;
-      var S = () => null;
+      var sin = Math.sin;
+      var abs = Math.abs;
+      var floor = Math.floor;
+      var ceil = Math.ceil;
+      var seq = () => null;
+      var expEnv = () => null;
+      var invEnv = () => null;
       eval(content);
       return true;
     } catch (err) {
@@ -85,21 +88,27 @@ class Index extends React.Component {
       var generator = null;
       eval(`generator = function(t, x, r, K) {
             var o = 0;
-            var s = Math.sin;
-            var S = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
-            var e = (subdiv, curve, smooth) => {
+
+            var sin = arg => (Math.sin(arg) + 1) / 2;
+            var abs = Math.abs;
+            var floor = Math.floor;
+            var ceil = Math.ceil;
+            var seq = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
+            var expEnv = (subdiv, curve, smooth) => {
               if (!smooth) smooth = 0.05;
               var tp = t%(K/subdiv)/(K/subdiv);
               var mult = (tp <= smooth) ? (tp / smooth) : 1;
               return Math.pow(1-tp, curve) * mult;
             };
-            var i = (subdiv, curve, smooth) => {
+            var invEnv = (subdiv, curve, smooth) => {
               if (!smooth) smooth = 0.05;
               var tp = t%(K/subdiv)/(K/subdiv);
               var mult = (tp >= 1-smooth) ? ((1-tp) / smooth) : 1;
               return Math.pow(tp, curve) * mult;
             };
-            ${content};
+
+            ${content}
+
             return [o, r, K];
         }`);
       console.log(`generator: ${generator}`);

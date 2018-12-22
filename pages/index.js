@@ -21,7 +21,9 @@ const StopButton = props => <Button src={`static/stop.svg`} {...props} />;
 class Index extends React.Component {
   state = {
     audioContext: null,
-    generator: null
+    generator: null,
+    isPlaying: false,
+    isFlashing: false
   };
 
   editorRef = React.createRef();
@@ -100,7 +102,8 @@ class Index extends React.Component {
             return [o, r, K];
         }`);
       console.log(`generator: ${generator}`);
-      this.setState({ generator: generator });
+      this.setState({ generator: generator, isFlashing: true });
+      setTimeout(() => this.setState({ isFlashing: false }), 500);
       this.play();
     }
   }
@@ -125,10 +128,10 @@ class Index extends React.Component {
   }
 
   render() {
-    const { audioContext, isPlaying, generator } = this.state;
+    const { audioContext, isPlaying, generator, isFlashing } = this.state;
 
     return (
-      <div>
+      <div className={isFlashing ? "flash" : ""}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <meta charSet="utf-8" />
@@ -162,11 +165,38 @@ class Index extends React.Component {
             background-color: transparent;
             margin: 0;
           }
+        `}</style>
+        <style jsx>{`
           .controls {
             position: absolute;
             right: 1.5em;
             bottom: 1em;
             z-index: 1;
+          }
+
+          .flash {
+            -webkit-animation-name: flash-animation;
+            -webkit-animation-duration: 0.2s;
+            animation-name: flash-animation;
+            animation-duration: 0.2s;
+          }
+
+          @-webkit-keyframes flash-animation {
+            from {
+              background: black;
+            }
+            to {
+              background: default;
+            }
+          }
+
+          @keyframes flash-animation {
+            from {
+              background: black;
+            }
+            to {
+              background: default;
+            }
           }
         `}</style>
       </div>

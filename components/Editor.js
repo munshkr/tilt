@@ -1,7 +1,7 @@
 import AceEditor from "react-ace";
 
 import "brace/mode/javascript";
-import "brace/theme/github";
+import "brace/theme/tomorrow";
 
 const style = {
   width: "100vw",
@@ -40,33 +40,43 @@ class Editor extends React.Component {
     const { content } = this.state;
 
     return (
-      <AceEditor
-        ref={editorRef}
-        mode="javascript"
-        theme="github"
-        name="editor"
-        showGutter={false}
-        showPrintMargin={false}
-        wrapEnabled={true}
-        fontSize={24}
-        focus={true}
-        value={content}
-        style={style}
-        onChange={this._onChange}
-        editorProps={{ $blockScrolling: true }}
-        commands={[
-          {
-            name: "evaluate",
-            bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-            exec: onEval
-          },
-          {
-            name: "stop",
-            bindKey: { win: "Ctrl-.", mac: "Command-." },
-            exec: onStop
+      <div>
+        <AceEditor
+          ref={editorRef}
+          mode="javascript"
+          theme="tomorrow"
+          name="editor"
+          showGutter={false}
+          showPrintMargin={false}
+          wrapEnabled={true}
+          fontSize={24}
+          focus={true}
+          value={content}
+          style={style}
+          onChange={this._onChange}
+          editorProps={{ $blockScrolling: true }}
+          commands={[
+            {
+              name: "evaluate",
+              bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
+              exec: onEval
+            },
+            {
+              name: "stop",
+              bindKey: { win: "Ctrl-.", mac: "Command-." },
+              exec: onStop
+            }
+          ]}
+        />
+        <style jsx global>{`
+          .ace-tomorrow .ace_marker-layer .ace_active-line {
+            background: #efefefc0 !important;
           }
-        ]}
-      />
+          .ace-tomorrow .ace_marker-layer .ace_selection {
+            background: #d6d6d6c0 !important;
+          }
+        `}</style>
+      </div>
     );
   }
 }

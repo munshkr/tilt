@@ -14,3 +14,4 @@ GPL 3+. Refer to [LICENSE.txt](LICENSE.txt)
 
 Icons:
 * play by Eagle Eye from the Noun Project
+* Stop by vectoriconset10 from the Noun Project

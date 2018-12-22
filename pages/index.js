@@ -11,21 +11,25 @@ const DEFAULT_CONTENT = `// Define variable o to set audio output, like this:
 o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 `;
 
-const PlayButton = ({ onClick }) => (
-  <div>
-    <img src="static/play.svg" onClick={onClick} />
-    <style jsx>{`
-      img {
-        position: absolute;
-        right: 1.5em;
-        top: 1em;
-        width: 32px;
-        height: 32px;
-        cursor: pointer;
-      }
-    `}</style>
-  </div>
-);
+const PlayButton = ({ onClick, isPlaying }) => {
+  const imgName = isPlaying ? "stop" : "play";
+
+  return (
+    <div>
+      <img src={`static/${imgName}.svg`} onClick={onClick} />
+      <style jsx>{`
+        img {
+          position: absolute;
+          right: 1.5em;
+          top: 1em;
+          width: 32px;
+          height: 32px;
+          cursor: pointer;
+        }
+      `}</style>
+    </div>
+  );
+};
 
 class Index extends React.Component {
   state = {
@@ -113,9 +117,13 @@ class Index extends React.Component {
   }
 
   _onPlayButtonClick() {
-    const editor = this.editorRef.current.editor;
-    const content = editor.getValue();
-    this.eval(content);
+    if (this.state.isPlaying) {
+      this.stop();
+    } else {
+      const editor = this.editorRef.current.editor;
+      const content = editor.getValue();
+      this.eval(content);
+    }
   }
 
   render() {
@@ -140,7 +148,7 @@ class Index extends React.Component {
           isPlaying={isPlaying}
           generator={generator}
         />
-        <PlayButton onClick={this._onPlayButtonClick} />
+        <PlayButton onClick={this._onPlayButtonClick} isPlaying={isPlaying} />
 
         <style global jsx>
           {`

@@ -10,6 +10,7 @@ class Oscilloscope extends React.Component {
 
     const analyser = audioContext.createAnalyser();
     this.analyser = analyser;
+    analyser.fftSize = 4096;
     synthRef.current.connectToSynth(analyser);
 
     let waveform = new Float32Array(analyser.frequencyBinCount);

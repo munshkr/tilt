@@ -87,13 +87,13 @@ class Index extends React.Component {
             var ceil = Math.ceil;
             var seq = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
             var expEnv = (subdiv, curve, smooth) => {
-              if (!smooth) smooth = 0.05;
+              if (typeof(smooth) === 'undefined') smooth = 0.05;
               var tp = t%(K/subdiv)/(K/subdiv);
               var mult = (tp <= smooth) ? (tp / smooth) : 1;
               return Math.pow(1-tp, curve) * mult;
             };
             var invEnv = (subdiv, curve, smooth) => {
-              if (!smooth) smooth = 0.05;
+              if (typeof(smooth) === 'undefined') smooth = 0.05;
               var tp = t%(K/subdiv)/(K/subdiv);
               var mult = (tp >= 1-smooth) ? ((1-tp) / smooth) : 1;
               return Math.pow(tp, curve) * mult;

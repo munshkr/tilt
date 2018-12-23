@@ -1,4 +1,4 @@
-# tilt
+# Tilt
 
 Bytebeat-inspired live coding thingie for waveshaping synthesis.
 

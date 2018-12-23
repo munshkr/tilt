@@ -4,6 +4,8 @@ Bytebeat-inspired live coding thingie for waveshaping synthesis.
 
 Runs on modern browsers using the WebAudio API.
 
+![](https://i.imgur.com/A5tEv5z.gifv)
+
 
 ## Usage
 

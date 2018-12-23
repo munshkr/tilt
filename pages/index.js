@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { withRouter } from "next/router";
+import getConfig from "next/config";
 
 import lzwCompress from "lzwcompress";
 
@@ -10,7 +11,8 @@ import SynthController from "../components/SynthController";
 import Oscilloscope from "../components/Oscilloscope";
 import ErrorMessage from "../components/ErrorMessage";
 
-const assetPrefix = process.env.NODE_ENV === "production" ? "/tilt" : "";
+const { publicRuntimeConfig } = getConfig();
+const { assetPrefix } = publicRuntimeConfig;
 
 const URL_VERSION = 1;
 

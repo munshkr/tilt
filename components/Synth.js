@@ -32,11 +32,13 @@ class Synth {
 
   _initialize() {
     if (!this.node && this.audioContext) {
+      console.log(`sampleRate = ${this.audioContext.sampleRate}`);
       if (this.K === null) {
         this.K = (this.audioContext.sampleRate / 4) * this.r;
-        //console.log(`K = ${this.K}`);
+        console.log(`K = ${this.K}`);
       }
-      this.node = this.audioContext.createScriptProcessor(0, 0, 2);
+      this.node = this.audioContext.createScriptProcessor(4096, 0, 2);
+      console.log(`bufferSize = ${this.node.bufferSize}`);
       this.node.onaudioprocess = event => this._onAudioProcess(event);
     }
   }

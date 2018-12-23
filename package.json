@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "export": "yarn build && next export",
-    "deploy": "yarn export && gh-pages -d out"
+    "deploy": "yarn export && touch out/.nojekyll && gh-pages -d out"
   },
   "keywords": [],
   "author": "Damián Silvani",

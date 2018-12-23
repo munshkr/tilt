@@ -116,7 +116,10 @@ class Index extends React.Component {
   }
 
   stop() {
-    this.setState({ isPlaying: false });
+    if (this.state.isPlaying) {
+      this._flash();
+      this.setState({ isPlaying: false });
+    }
   }
 
   eval(content) {
@@ -128,10 +131,15 @@ class Index extends React.Component {
         ${content};
         return [o, r, K];
       }`);
-      this.setState({ generator: generator, isFlashing: true });
-      setTimeout(() => this.setState({ isFlashing: false }), 500);
+      this.setState({ generator: generator });
+      this._flash();
       this.play();
     }
+  }
+
+  _flash() {
+    this.setState({ isFlashing: true });
+    setTimeout(() => this.setState({ isFlashing: false }), 500);
   }
 
   _onEval(editor) {

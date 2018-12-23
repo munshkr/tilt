@@ -34,6 +34,9 @@ class Editor extends React.Component {
   _onChange = text => {
     this._setLastContent(text);
     this.setState({ content: text });
+    if (this.props.onChange) {
+      this.props.onChange(text);
+    }
   };
 
   render() {

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Button from "../components/Button";
 import SynthController from "../components/SynthController";
 import Oscilloscope from "../components/Oscilloscope";
+import ErrorMessage from "../components/ErrorMessage";
 
 const Editor = dynamic(() => import("../components/Editor"), {
   ssr: false,
@@ -69,7 +70,8 @@ class Index extends React.Component {
     audioContext: null,
     generator: null,
     isPlaying: false,
-    isFlashing: false
+    isFlashing: false,
+    error: null
   };
 
   editorRef = React.createRef();
@@ -79,6 +81,7 @@ class Index extends React.Component {
     super(props);
     this._onEval = this._onEval.bind(this);
     this._onStop = this._onStop.bind(this);
+    this._onChange = this._onChange.bind(this);
     this._onPlayButtonClick = this._onPlayButtonClick.bind(this);
     this._onStopButtonClick = this._onStopButtonClick.bind(this);
   }
@@ -98,6 +101,7 @@ class Index extends React.Component {
       );
       return true;
     } catch (err) {
+      this.setState({ error: err.message });
       console.error(err);
       return false;
     }
@@ -149,6 +153,10 @@ class Index extends React.Component {
     this.stop();
   }
 
+  _onChange() {
+    this.setState({ error: null });
+  }
+
   render() {
     const { audioContext, isPlaying, generator, isFlashing } = this.state;
 
@@ -164,6 +172,7 @@ class Index extends React.Component {
           editorRef={this.editorRef}
           onEval={this._onEval}
           onStop={this._onStop}
+          onChange={this._onChange}
           defaultContent={DEFAULT_CONTENT}
         />
         <SynthController
@@ -181,6 +190,7 @@ class Index extends React.Component {
           synthRef={this.synthRef}
           isPlaying={isPlaying}
         />
+        {this.state.error ? <ErrorMessage message={this.state.error} /> : ""}
 
         <style global jsx>{`
           body {
@@ -193,7 +203,7 @@ class Index extends React.Component {
             position: absolute;
             right: 1.5em;
             bottom: 1em;
-            z-index: 1;
+            z-index: 2;
           }
 
           .flash {

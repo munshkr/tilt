@@ -1,11 +1,18 @@
 import React from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
+import { withRouter } from "next/router";
+
+import lzwCompress from "lzwcompress";
 
 import Button from "../components/Button";
 import SynthController from "../components/SynthController";
 import Oscilloscope from "../components/Oscilloscope";
 import ErrorMessage from "../components/ErrorMessage";
+
+const assetPrefix = process.env.NODE_ENV === "production" ? "/tilt" : "";
+
+const URL_VERSION = 1;
 
 const Editor = dynamic(() => import("../components/Editor"), {
   ssr: false,
@@ -18,6 +25,7 @@ o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 
 const PlayButton = props => <Button src={`static/play.svg`} {...props} />;
 const StopButton = props => <Button src={`static/stop.svg`} {...props} />;
+const ShareButton = props => <Button src={`static/share.svg`} {...props} />;
 
 const prelude = `
   // constants
@@ -68,6 +76,7 @@ const prelude = `
 class Index extends React.Component {
   state = {
     audioContext: null,
+    content: DEFAULT_CONTENT,
     generator: null,
     isPlaying: false,
     isFlashing: false,
@@ -84,6 +93,44 @@ class Index extends React.Component {
     this._onChange = this._onChange.bind(this);
     this._onPlayButtonClick = this._onPlayButtonClick.bind(this);
     this._onStopButtonClick = this._onStopButtonClick.bind(this);
+    this._onShareButtonClick = this._onShareButtonClick.bind(this);
+  }
+
+  componentDidMount() {
+    let content;
+    const { query } = this.props.router;
+
+    // If URL contains a "c" param, decode source code
+    if (query.c) {
+      content = this._decodeCode(query.c);
+    } else {
+      // Otherwise, try to get last content from localStorage
+      content = this._getLastContent();
+    }
+
+    // If any, set content
+    if (content) {
+      this.setState({ content: content });
+    }
+  }
+
+  _decodeCode(code) {
+    try {
+      const buf = atob(code)
+        .split(",")
+        .map(parseFloat);
+      return lzwCompress.unpack(buf);
+    } catch (err) {
+      this.setState({ error: `(Invalid URL) ${err.message}` });
+    }
+  }
+
+  _getLastContent() {
+    return localStorage.getItem("lastContent");
+  }
+
+  _setLastContent(content) {
+    localStorage.setItem("lastContent", content);
   }
 
   _tryEval(content) {
@@ -152,8 +199,7 @@ class Index extends React.Component {
   }
 
   _onPlayButtonClick() {
-    const editor = this.editorRef.current.editor;
-    const content = editor.getValue();
+    const content = this._getEditorContent();
     this.eval(content);
   }
 
@@ -161,8 +207,26 @@ class Index extends React.Component {
     this.stop();
   }
 
-  _onChange() {
-    this.setState({ error: null });
+  _onShareButtonClick() {
+    const content = this._getEditorContent();
+    const url = this._generateURL(content);
+    this.props.router.replace(url, url, { shallow: true });
+  }
+
+  _generateURL(content) {
+    const buf = lzwCompress.pack(content);
+    const code = btoa(buf);
+    return `${assetPrefix}/?v=${URL_VERSION}&c=${code}`;
+  }
+
+  _onChange = text => {
+    this._setLastContent(text);
+    this.setState({ content: text, error: null });
+  };
+
+  _getEditorContent() {
+    const editor = this.editorRef.current.editor;
+    return editor.getValue();
   }
 
   render() {
@@ -181,7 +245,7 @@ class Index extends React.Component {
           onEval={this._onEval}
           onStop={this._onStop}
           onChange={this._onChange}
-          defaultContent={DEFAULT_CONTENT}
+          content={this.state.content}
         />
         <SynthController
           ref={this.synthRef}
@@ -192,6 +256,7 @@ class Index extends React.Component {
         <div className="controls">
           <PlayButton onClick={this._onPlayButtonClick} />
           <StopButton onClick={this._onStopButtonClick} disabled={!isPlaying} />
+          <ShareButton onClick={this._onShareButtonClick} />
         </div>
         <Oscilloscope
           audioContext={audioContext}
@@ -244,4 +309,4 @@ class Index extends React.Component {
   }
 }
 
-export default Index;
+export default withRouter(Index);

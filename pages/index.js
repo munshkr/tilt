@@ -53,6 +53,7 @@ const prelude = `
     (((n+seed)*(n+seed)*prime1 + (n+seed)*prime2) % prime3) / prime3;
 
   const rand = (subdiv, seed) => {
+    if (typeof(subdiv) === 'undefined') subdiv = 1;
     if (typeof(seed) === 'undefined') seed = 0;
     const v = Math.floor(t / (K / subdiv));
     return random(v, seed);

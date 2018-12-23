@@ -18,6 +18,51 @@ o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 const PlayButton = props => <Button src={`static/play.svg`} {...props} />;
 const StopButton = props => <Button src={`static/stop.svg`} {...props} />;
 
+const prelude = `
+  // constants
+  const pi = Math.PI;
+
+  // basic functions
+  const sin = arg => (Math.sin(arg) + 1) / 2;
+  const abs = Math.abs;
+  const floor = Math.floor;
+  const ceil = Math.ceil;
+
+  // sequences
+  const seq = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
+
+  // envelopes
+  const expEnv = (subdiv, curve, smooth) => {
+    if (typeof(smooth) === 'undefined') smooth = 0.05;
+    var tp = t%(K/subdiv)/(K/subdiv);
+    var mult = (tp <= smooth) ? (tp / smooth) : 1;
+    return Math.pow(1-tp, curve) * mult;
+  };
+  const invEnv = (subdiv, curve, smooth) => {
+    if (typeof(smooth) === 'undefined') smooth = 0.05;
+    var tp = t%(K/subdiv)/(K/subdiv);
+    var mult = (tp >= 1-smooth) ? ((1-tp) / smooth) : 1;
+    return Math.pow(tp, curve) * mult;
+  };
+
+  // randomness
+  const prime1 = 1120911527;
+  const prime2 = 341225299;
+  const prime3 = 3073422643;
+  const random = (n, seed) =>
+    (((n+seed)*(n+seed)*prime1 + (n+seed)*prime2) % prime3) / prime3;
+
+  const rand = (subdiv, seed) => {
+    if (typeof(seed) === 'undefined') seed = 0;
+    const v = Math.floor(t / (K / subdiv));
+    return random(v, seed);
+  };
+  const randInt = (max, subdiv, seed) => {
+    max = Math.floor(max);
+    return Math.floor(rand(subdiv, seed) * max);
+  };
+`;
+
 class Index extends React.Component {
   state = {
     audioContext: null,
@@ -41,20 +86,15 @@ class Index extends React.Component {
     try {
       // parameters
       var t = 0;
-      var K = 0;
       var r = 1;
-      var x = 0;
+      var K = 0;
       // global variables and functions
       var o = 0;
-      var pi = Math.PI;
-      var sin = Math.sin;
-      var abs = Math.abs;
-      var floor = Math.floor;
-      var ceil = Math.ceil;
-      var seq = () => null;
-      var expEnv = () => null;
-      var invEnv = () => null;
-      eval(content);
+      // content
+      eval(
+        `${prelude};
+        ${content}`
+      );
       return true;
     } catch (err) {
       console.error(err);
@@ -77,33 +117,12 @@ class Index extends React.Component {
   eval(content) {
     if (this._tryEval(content)) {
       var generator = null;
-      eval(`generator = function(t, x, r, K) {
-            var o = 0;
-
-            var pi = Math.PI;
-            var sin = arg => (Math.sin(arg) + 1) / 2;
-            var abs = Math.abs;
-            var floor = Math.floor;
-            var ceil = Math.ceil;
-            var seq = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
-            var expEnv = (subdiv, curve, smooth) => {
-              if (typeof(smooth) === 'undefined') smooth = 0.05;
-              var tp = t%(K/subdiv)/(K/subdiv);
-              var mult = (tp <= smooth) ? (tp / smooth) : 1;
-              return Math.pow(1-tp, curve) * mult;
-            };
-            var invEnv = (subdiv, curve, smooth) => {
-              if (typeof(smooth) === 'undefined') smooth = 0.05;
-              var tp = t%(K/subdiv)/(K/subdiv);
-              var mult = (tp >= 1-smooth) ? ((1-tp) / smooth) : 1;
-              return Math.pow(tp, curve) * mult;
-            };
-
-            ${content}
-
-            return [o, r, K];
-        }`);
-      console.log(`generator: ${generator}`);
+      eval(`generator = (t, r, K) => {
+        let o = 0;
+        ${prelude};
+        ${content};
+        return [o, r, K];
+      }`);
       this.setState({ generator: generator, isFlashing: true });
       setTimeout(() => this.setState({ isFlashing: false }), 500);
       this.play();

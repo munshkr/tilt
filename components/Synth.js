@@ -9,9 +9,8 @@ class Synth {
     this.gain = 0.5;
     this.r = 1;
     this.t = 0;
-    this.x = Math.random();
 
-    this.generator = (t, x, r, K) => [0, r, K];
+    this.generator = (t, r, K) => [0, r, K];
   }
 
   play() {
@@ -58,7 +57,7 @@ class Synth {
         let outputData = outputBuffer.getChannelData(c);
 
         // Generate sample
-        const [o, r, K] = this.generator(sampleAngle, this.x, this.r, this.K);
+        const [o, r, K] = this.generator(sampleAngle, this.r, this.K);
         outputData[s] = this.gain * (o * 2 - 1);
 
         // Update other state variables
@@ -68,12 +67,6 @@ class Synth {
 
       // Increment counter
       this.t++;
-
-      // Reset random variable
-      if (this.t % this.K === 0) {
-        this.x = Math.random();
-        //console.log(`t == ${this.t}, K = ${this.K}, this.x = ${this.x}`);
-      }
     }
   }
 }

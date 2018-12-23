@@ -2,6 +2,7 @@ import AceEditor from "react-ace";
 
 import "brace/mode/javascript";
 import "brace/theme/tomorrow";
+import "brace/ext/language_tools";
 
 const style = {
   width: "100vw",
@@ -67,6 +68,13 @@ class Editor extends React.Component {
               exec: onStop
             }
           ]}
+          setOptions={{
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+            enableSnippets: false,
+            showLineNumbers: false,
+            tabSize: 2
+          }}
         />
         <style jsx global>{`
           .ace-tomorrow .ace_marker-layer .ace_active-line {

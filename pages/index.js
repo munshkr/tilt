@@ -101,7 +101,7 @@ class Index extends React.Component {
   componentDidMount() {
     let content;
     const { query } = this.props.router;
-    console.log(`query params = ${query}`);
+    console.log(`query params = ${JSON.stringify(query)}`);
 
     // If URL contains a "c" param, decode source code
     if (query.c) {

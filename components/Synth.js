@@ -13,10 +13,18 @@ class Synth {
     this.generator = (t, r, K) => [0, r, K];
   }
 
+  _setGainTarget(targetValue) {
+    this.gainNode.gain.setTargetAtTime(
+      targetValue,
+      this.audioContext.currentTime,
+      0.015
+    );
+  }
+
   play() {
     if (!this.isPlaying) {
       this._initialize();
-      this.node.connect(this.audioContext.destination);
+      this._setGainTarget(this.gain);
       this.isPlaying = true;
       console.log("play");
     }
@@ -24,7 +32,7 @@ class Synth {
 
   stop() {
     if (this.isPlaying) {
-      this.node.disconnect(this.audioContext.destination);
+      this._setGainTarget(0);
       this.isPlaying = false;
       console.log("stop");
     }
@@ -40,6 +48,11 @@ class Synth {
       this.node = this.audioContext.createScriptProcessor(4096, 0, 2);
       console.log(`bufferSize = ${this.node.bufferSize}`);
       this.node.onaudioprocess = event => this._onAudioProcess(event);
+
+      this.gainNode = this.audioContext.createGain();
+      this.gainNode.value = this.gain;
+      this.node.connect(this.gainNode);
+      this.gainNode.connect(this.audioContext.destination);
     }
   }
 
@@ -60,7 +73,7 @@ class Synth {
 
         // Generate sample
         const [o, r, K] = this.generator(sampleAngle, this.r, this.K);
-        outputData[s] = this.gain * (o * 2 - 1);
+        outputData[s] = o * 2 - 1;
 
         // Update other state variables
         this.r = r;

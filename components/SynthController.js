@@ -24,13 +24,13 @@ class SynthController extends React.Component {
 
   connectToSynth(node) {
     if (this.synth) {
-      this.synth.node.connect(node);
+      this.synth.gainNode.connect(node);
     }
   }
 
   disconnectFromSynth(node) {
     if (this.synth) {
-      this.synth.node.disconnect(node);
+      this.synth.gainNode.disconnect(node);
     }
   }
 

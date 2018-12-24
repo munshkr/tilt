@@ -105,6 +105,7 @@ class Index extends React.Component {
     // If URL contains a "c" param, decode source code
     if (query.c) {
       content = this._decodeCode(query.c);
+      console.log("load code from query params");
     } else {
       // Otherwise, try to get last content from localStorage
       content = this._getLastContent();
@@ -112,6 +113,7 @@ class Index extends React.Component {
 
     // If any, set content
     if (content) {
+      console.log("found! set content");
       this.setState({ content: content });
     }
   }

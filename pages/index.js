@@ -101,7 +101,7 @@ class Index extends React.Component {
   componentDidMount() {
     let content;
 
-    const query = this._getQueryStringParams();
+    const query = this._getHashStringParams();
     console.log(`query params = ${JSON.stringify(query)}`);
 
     // If URL contains a "c" param, decode source code
@@ -131,8 +131,8 @@ class Index extends React.Component {
     }
   }
 
-  _getQueryStringParams() {
-    const query = window.location.search;
+  _getHashStringParams() {
+    const query = window.location.hash;
     return query
       ? (/^[?#]/.test(query) ? query.slice(1) : query)
           .split("&")
@@ -237,7 +237,7 @@ class Index extends React.Component {
   _generateURL(content) {
     const buf = lzwCompress.pack(content);
     const code = btoa(buf);
-    return `${assetPrefix}/?v=${URL_VERSION}&c=${code}`;
+    return `${assetPrefix}/#v=${URL_VERSION}&c=${code}`;
   }
 
   _onChange = text => {

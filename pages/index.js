@@ -100,7 +100,8 @@ class Index extends React.Component {
 
   componentDidMount() {
     let content;
-    const { query } = this.props.router;
+
+    const query = this._getQueryStringParams();
     console.log(`query params = ${JSON.stringify(query)}`);
 
     // If URL contains a "c" param, decode source code
@@ -128,6 +129,21 @@ class Index extends React.Component {
     } catch (err) {
       this.setState({ error: `(Invalid URL) ${err.message}` });
     }
+  }
+
+  _getQueryStringParams() {
+    const query = window.location.search;
+    return query
+      ? (/^[?#]/.test(query) ? query.slice(1) : query)
+          .split("&")
+          .reduce((params, param) => {
+            let [key, value] = param.split("=");
+            params[key] = value
+              ? decodeURIComponent(value.replace(/\+/g, " "))
+              : "";
+            return params;
+          }, {})
+      : {};
   }
 
   _getLastContent() {

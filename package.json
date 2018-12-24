@@ -7,8 +7,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "export": "yarn build && next export",
-    "deploy": "yarn export && touch out/.nojekyll && gh-pages -t -d out"
+    "export": "yarn build && next export"
   },
   "keywords": [],
   "author": "Damián Silvani",
@@ -21,7 +20,5 @@
     "react-ace": "^6.2.0",
     "react-dom": "^16.6.3"
   },
-  "devDependencies": {
-    "gh-pages": "^2.0.1"
-  }
+  "devDependencies": {}
 }

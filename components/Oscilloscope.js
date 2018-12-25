@@ -1,5 +1,8 @@
 import React from "react";
 
+const FFT_SIZE = 2048;
+const CANVAS_HEIGHT = 400;
+
 class Oscilloscope extends React.Component {
   componentDidUpdate() {
     const { audioContext, synthRef, isPlaying } = this.props;
@@ -10,7 +13,7 @@ class Oscilloscope extends React.Component {
 
     const analyser = audioContext.createAnalyser();
     this.analyser = analyser;
-    analyser.fftSize = 2048;
+    analyser.fftSize = FFT_SIZE;
     synthRef.current.connectToSynth(analyser);
 
     let waveform = new Float32Array(analyser.frequencyBinCount);
@@ -23,7 +26,7 @@ class Oscilloscope extends React.Component {
 
     let canvas = this.refs.canvas;
     canvas.width = waveform.length;
-    canvas.height = 400;
+    canvas.height = CANVAS_HEIGHT;
 
     let ctx = canvas.getContext("2d");
 

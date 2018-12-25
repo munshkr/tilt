@@ -3,15 +3,6 @@ import React from "react";
 const FFT_SIZE = 2048;
 const CANVAS_HEIGHT = 400;
 
-const canvasStyle = {
-  width: "100vw",
-  height: "100vh",
-  position: "absolute",
-  top: 0,
-  left: 0,
-  zIndex: -10
-};
-
 class Oscilloscope extends React.Component {
   constructor(props) {
     super(props);
@@ -37,12 +28,10 @@ class Oscilloscope extends React.Component {
   }
 
   componentDidUpdate() {
-    console.log(`componentDidUpdate`);
     this._draw();
   }
 
   componentWillUnmount() {
-    console.log(`componentWillUnmount`);
     const { synthRef } = this.props;
 
     cancelAnimationFrame(this.rafId);
@@ -53,18 +42,30 @@ class Oscilloscope extends React.Component {
   }
 
   render() {
-    return <canvas ref="canvas" style={canvasStyle} />;
+    return (
+      <div>
+        <canvas ref="canvas" />
+        <style jsx>{`
+          canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -10;
+          }
+        `}</style>
+      </div>
+    );
   }
 
   _tick() {
-    console.log(`tick`);
     this.analyser.getFloatTimeDomainData(this.dataArray);
     this.setState({ audioData: this.dataArray });
     this.rafId = requestAnimationFrame(this._tick);
   }
 
   _draw() {
-    console.log(`draw`);
     const { audioData } = this.state;
     const { canvas } = this.refs;
 

@@ -7,6 +7,7 @@ class Oscilloscope extends React.Component {
   constructor(props) {
     super(props);
     this._tick = this._tick.bind(this);
+    this._draw = this._draw.bind(this);
   }
 
   componentDidMount() {
@@ -18,9 +19,6 @@ class Oscilloscope extends React.Component {
     this.dataArray = new Float32Array(this.analyser.frequencyBinCount);
 
     synthRef.current.connectToSynth(this.analyser);
-
-    this._updateCanvasSize();
-    this._tick();
   }
 
   _updateCanvasSize() {
@@ -33,12 +31,15 @@ class Oscilloscope extends React.Component {
 
   componentDidUpdate() {
     this._updateCanvasSize();
+    this._tick();
+    this._draw();
   }
 
   componentWillUnmount() {
     const { synthRef } = this.props;
 
-    cancelAnimationFrame(this.rafId);
+    cancelAnimationFrame(this.tickRafId);
+    cancelAnimationFrame(this.drawRafId);
     synthRef.current.disconnectFromSynth(this.analyser);
     this.analyser = null;
     this.dataArray = null;
@@ -68,8 +69,7 @@ class Oscilloscope extends React.Component {
 
   _tick() {
     this.analyser.getFloatTimeDomainData(this.dataArray);
-    this._draw();
-    this.rafId = requestAnimationFrame(this._tick);
+    this.tickRafId = requestAnimationFrame(this._tick);
   }
 
   _draw() {
@@ -91,6 +91,8 @@ class Oscilloscope extends React.Component {
       }
     }
     ctx.stroke();
+
+    this.drawRafId = requestAnimationFrame(this._draw);
   }
 }
 

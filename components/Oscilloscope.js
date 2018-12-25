@@ -35,14 +35,15 @@ class Oscilloscope extends React.Component {
     const { synthRef } = this.props;
 
     cancelAnimationFrame(this.rafId);
-    this.analyser.disconnect();
-    if (synthRef.current) {
-      synthRef.current.disconnectFromSynth(this.analyser);
-    }
+    synthRef.current.disconnectFromSynth(this.analyser);
+    this.analyser = null;
+    this.dataArray = null;
   }
 
   render() {
-    return (
+    const { isPlaying } = this.props;
+
+    return isPlaying ? (
       <div>
         <canvas ref="canvas" />
         <style jsx>{`
@@ -56,6 +57,8 @@ class Oscilloscope extends React.Component {
           }
         `}</style>
       </div>
+    ) : (
+      ""
     );
   }
 

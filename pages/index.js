@@ -280,8 +280,12 @@ class Index extends React.Component {
           <ShareButton onClick={this._onShareButtonClick} />
         </div>
 
-        {isPlaying ? (
-          <Oscilloscope audioContext={audioContext} synthRef={this.synthRef} />
+        {audioContext ? (
+          <Oscilloscope
+            audioContext={audioContext}
+            synthRef={this.synthRef}
+            isPlaying={isPlaying}
+          />
         ) : (
           ""
         )}

@@ -5,11 +5,46 @@ const CANVAS_HEIGHT = 400;
 
 class Oscilloscope extends React.Component {
   componentDidUpdate() {
-    const { audioContext, synthRef, isPlaying } = this.props;
+    const { audioContext, isPlaying } = this.props;
 
     if (!audioContext || !isPlaying) {
       return;
     }
+
+    this._initialize();
+  }
+
+  componentWillUnmount() {
+    const { synthRef } = this.props;
+
+    if (this.analiser) {
+      synthRef.current.disconnectFromSynth(this.analyser);
+      this.analiser = null;
+    }
+  }
+
+  render() {
+    const { isPlaying } = this.props;
+
+    return isPlaying ? (
+      <canvas
+        ref="canvas"
+        style={{
+          width: "100vw",
+          height: "100vh",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          zIndex: -10
+        }}
+      />
+    ) : (
+      ""
+    );
+  }
+
+  _initialize() {
+    const { audioContext, synthRef } = this.props;
 
     const analyser = audioContext.createAnalyser();
     this.analyser = analyser;
@@ -47,34 +82,6 @@ class Oscilloscope extends React.Component {
       }
       ctx.stroke();
     })();
-  }
-
-  componentWillUnmount() {
-    const { synthRef } = this.props;
-
-    if (this.analiser) {
-      synthRef.current.disconnectFromSynth(this.analyser);
-      this.analiser = null;
-    }
-  }
-
-  render() {
-    const { isPlaying } = this.props;
-    return isPlaying ? (
-      <canvas
-        ref="canvas"
-        style={{
-          width: "100vw",
-          height: "100vh",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          zIndex: -10
-        }}
-      />
-    ) : (
-      ""
-    );
   }
 }
 

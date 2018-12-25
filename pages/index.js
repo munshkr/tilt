@@ -253,6 +253,10 @@ class Index extends React.Component {
   render() {
     const { audioContext, isPlaying, generator, isFlashing } = this.state;
 
+    const oscilloscope = (
+      <Oscilloscope audioContext={audioContext} synthRef={this.synthRef} />
+    );
+
     return (
       <div className={isFlashing ? "flash" : ""}>
         <Head>
@@ -279,11 +283,7 @@ class Index extends React.Component {
           <StopButton onClick={this._onStopButtonClick} disabled={!isPlaying} />
           <ShareButton onClick={this._onShareButtonClick} />
         </div>
-        <Oscilloscope
-          audioContext={audioContext}
-          synthRef={this.synthRef}
-          isPlaying={isPlaying}
-        />
+        {isPlaying ? oscilloscope : ""}
         {this.state.error ? <ErrorMessage message={this.state.error} /> : ""}
 
         <style global jsx>{`

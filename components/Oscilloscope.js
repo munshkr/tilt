@@ -3,85 +3,87 @@ import React from "react";
 const FFT_SIZE = 2048;
 const CANVAS_HEIGHT = 400;
 
+const canvasStyle = {
+  width: "100vw",
+  height: "100vh",
+  position: "absolute",
+  top: 0,
+  left: 0,
+  zIndex: -10
+};
+
 class Oscilloscope extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { audioData: new Float32Array(0) };
+    this._tick = this._tick.bind(this);
+  }
+
+  componentDidMount() {
+    const { synthRef, audioContext } = this.props;
+
+    this.analyser = audioContext.createAnalyser();
+    this.analyser.fftSize = FFT_SIZE;
+
+    this.dataArray = new Float32Array(this.analyser.frequencyBinCount);
+
+    synthRef.current.connectToSynth(this.analyser);
+
+    const canvas = this.refs.canvas;
+    canvas.width = this.dataArray.length;
+    canvas.height = CANVAS_HEIGHT;
+
+    this._tick();
+  }
+
   componentDidUpdate() {
-    const { audioContext, isPlaying } = this.props;
-
-    if (!audioContext || !isPlaying) {
-      return;
-    }
-
-    this._initialize();
+    console.log(`componentDidUpdate`);
+    this._draw();
   }
 
   componentWillUnmount() {
+    console.log(`componentWillUnmount`);
     const { synthRef } = this.props;
 
-    if (this.analiser) {
+    cancelAnimationFrame(this.rafId);
+    this.analyser.disconnect();
+    if (synthRef.current) {
       synthRef.current.disconnectFromSynth(this.analyser);
-      this.analiser = null;
     }
   }
 
   render() {
-    const { isPlaying } = this.props;
-
-    return isPlaying ? (
-      <canvas
-        ref="canvas"
-        style={{
-          width: "100vw",
-          height: "100vh",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          zIndex: -10
-        }}
-      />
-    ) : (
-      ""
-    );
+    return <canvas ref="canvas" style={canvasStyle} />;
   }
 
-  _initialize() {
-    const { audioContext, synthRef } = this.props;
+  _tick() {
+    console.log(`tick`);
+    this.analyser.getFloatTimeDomainData(this.dataArray);
+    this.setState({ audioData: this.dataArray });
+    this.rafId = requestAnimationFrame(this._tick);
+  }
 
-    const analyser = audioContext.createAnalyser();
-    this.analyser = analyser;
-    analyser.fftSize = FFT_SIZE;
-    synthRef.current.connectToSynth(analyser);
+  _draw() {
+    console.log(`draw`);
+    const { audioData } = this.state;
+    const { canvas } = this.refs;
 
-    let waveform = new Float32Array(analyser.frequencyBinCount);
-    analyser.getFloatFrequencyData(waveform);
+    if (!canvas) return;
 
-    (function updateWaveform() {
-      requestAnimationFrame(updateWaveform);
-      analyser.getFloatTimeDomainData(waveform);
-    })();
+    const ctx = canvas.getContext("2d");
 
-    let canvas = this.refs.canvas;
-    canvas.width = waveform.length;
-    canvas.height = CANVAS_HEIGHT;
-
-    let ctx = canvas.getContext("2d");
-
-    (function drawOscilloscope() {
-      requestAnimationFrame(drawOscilloscope);
-      analyser.getFloatTimeDomainData(waveform);
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
-      for (let i = 0; i < waveform.length; i++) {
-        const x = i;
-        const y = (0.5 - waveform[i] / 2) * canvas.height;
-        if (i == 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    for (let i = 0; i < audioData.length; i++) {
+      const x = i;
+      const y = (0.5 - audioData[i] / 2) * canvas.height;
+      if (i == 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
       }
-      ctx.stroke();
-    })();
+    }
+    ctx.stroke();
   }
 }
 

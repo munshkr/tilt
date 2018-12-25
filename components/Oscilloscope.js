@@ -6,7 +6,6 @@ const CANVAS_HEIGHT = 400;
 class Oscilloscope extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { audioData: new Float32Array(0) };
     this._tick = this._tick.bind(this);
   }
 
@@ -20,15 +19,20 @@ class Oscilloscope extends React.Component {
 
     synthRef.current.connectToSynth(this.analyser);
 
-    const canvas = this.refs.canvas;
-    canvas.width = this.dataArray.length;
-    canvas.height = CANVAS_HEIGHT;
-
+    this._updateCanvasSize();
     this._tick();
   }
 
+  _updateCanvasSize() {
+    const canvas = this.refs.canvas;
+    if (canvas) {
+      canvas.width = this.dataArray.length;
+      canvas.height = CANVAS_HEIGHT;
+    }
+  }
+
   componentDidUpdate() {
-    this._draw();
+    this._updateCanvasSize();
   }
 
   componentWillUnmount() {
@@ -64,12 +68,11 @@ class Oscilloscope extends React.Component {
 
   _tick() {
     this.analyser.getFloatTimeDomainData(this.dataArray);
-    this.setState({ audioData: this.dataArray });
+    this._draw();
     this.rafId = requestAnimationFrame(this._tick);
   }
 
   _draw() {
-    const { audioData } = this.state;
     const { canvas } = this.refs;
 
     if (!canvas) return;
@@ -78,9 +81,9 @@ class Oscilloscope extends React.Component {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
-    for (let i = 0; i < audioData.length; i++) {
+    for (let i = 0; i < this.dataArray.length; i++) {
       const x = i;
-      const y = (0.5 - audioData[i] / 2) * canvas.height;
+      const y = (0.5 - this.dataArray[i] / 2) * canvas.height;
       if (i == 0) {
         ctx.moveTo(x, y);
       } else {

@@ -4,6 +4,10 @@ const FFT_SIZE = 2048;
 const CANVAS_HEIGHT = 400;
 
 class Oscilloscope extends React.Component {
+  state = {
+    isDrawing: false
+  }
+
   constructor(props) {
     super(props);
     this._tick = this._tick.bind(this);
@@ -30,9 +34,13 @@ class Oscilloscope extends React.Component {
   }
 
   componentDidUpdate() {
-    this._updateCanvasSize();
-    this._tick();
-    this._draw();
+    if (!this.state.isDrawing) {
+      console.log(`start ticking`);
+      this._updateCanvasSize();
+      this._tick();
+      this._draw();
+      this.setState({ isDrawing: true });
+    }
   }
 
   componentWillUnmount() {

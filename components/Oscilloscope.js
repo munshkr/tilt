@@ -6,7 +6,7 @@ const CANVAS_HEIGHT = 400;
 class Oscilloscope extends React.Component {
   state = {
     isDrawing: false
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -56,11 +56,12 @@ class Oscilloscope extends React.Component {
   render() {
     const { isPlaying } = this.props;
 
-    return isPlaying ? (
+    return (
       <div>
         <canvas ref="canvas" />
         <style jsx>{`
           canvas {
+            ${isPlaying ? "" : "display: none"}
             position: absolute;
             top: 0;
             left: 0;
@@ -70,8 +71,6 @@ class Oscilloscope extends React.Component {
           }
         `}</style>
       </div>
-    ) : (
-      ""
     );
   }
 

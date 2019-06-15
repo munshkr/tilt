@@ -32,12 +32,46 @@ const ShareButton = props => <Button src={`static/share.svg`} {...props} />;
 const prelude = `
   // constants
   const pi = Math.PI;
+  const two_pi = 2 * pi;
 
   // basic functions
-  const sin = arg => (Math.sin(arg) + 1) / 2;
   const abs = Math.abs;
-  const floor = Math.floor;
+  const acosh = Math.acosh;
+  const acos = Math.acos;
+  const asinh = Math.asinh;
+  const asin = Math.asin;
+  const atan2 = Math.atan2;
+  const atanh = Math.atanh;
+  const atan = Math.atan;
+  const cbrt = Math.cbrt;
   const ceil = Math.ceil;
+  const cosh = Math.cosh;
+  const cos = Math.cos;
+  const exp = Math.exp;
+  const floor = Math.floor;
+  const log2 = Math.log2;
+  const log = Math.log;
+  const max = Math.max;
+  const min = Math.min;
+  const pow = Math.pow;
+  const round = Math.round;
+  const sign = Math.sign;
+  const sinh = Math.sinh;
+  const sin = Math.sin;
+  const sqrt = Math.sqrt;
+  const tanh = Math.tanh;
+  const tan = Math.tan;
+  const trunc = Math.trunc;
+
+  // waveforms
+  const sine = arg => (sin(arg) + 1) / 2;
+  const saw = arg => (arg % two_pi) / two_pi;
+  const pulse = (arg, width) => (saw(arg) > (width || 0.5));
+  const square = arg => pulse(arg, 0.5);
+  const triangle = arg => {
+    const r = saw(arg);
+    return ((r > 0.5 ? r : (1 - r)) - 0.5)*2;
+  };
 
   // sequences
   const seq = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
@@ -62,14 +96,13 @@ const prelude = `
   const prime3 = 3073422643;
   const random = (n, seed) =>
     (((n+seed)*(n+seed)*prime1 + (n+seed)*prime2) % prime3) / prime3;
-
   const rand = (subdiv, seed) => {
     if (typeof(subdiv) === 'undefined') subdiv = 1;
     if (typeof(seed) === 'undefined') seed = 0;
     const v = Math.floor(t / (K / subdiv));
     return random(v, seed);
   };
-  const randInt = (max, subdiv, seed) => {
+  const randInt = (subdiv, max, seed) => {
     max = Math.floor(max);
     return Math.floor(rand(subdiv, seed) * max);
   };

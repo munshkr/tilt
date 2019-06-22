@@ -14,11 +14,7 @@ class Synth {
   }
 
   _setGainTarget(targetValue) {
-    this.gainNode.gain.setTargetAtTime(
-      targetValue,
-      this.audioContext.currentTime,
-      0.015
-    );
+    this.gainNode.gain.setTargetAtTime(targetValue, this.audioContext.currentTime, 0.015);
   }
 
   play() {
@@ -26,7 +22,7 @@ class Synth {
       this._initialize();
       this._setGainTarget(this.gain);
       this.isPlaying = true;
-      console.log("play");
+      // console.log('play');
     }
   }
 
@@ -34,19 +30,19 @@ class Synth {
     if (this.isPlaying) {
       this._setGainTarget(0);
       this.isPlaying = false;
-      console.log("stop");
+      // console.log('stop');
     }
   }
 
   _initialize() {
     if (!this.node && this.audioContext) {
-      console.log(`sampleRate = ${this.audioContext.sampleRate}`);
+      // console.log(`sampleRate = ${this.audioContext.sampleRate}`);
       if (this.K === null) {
         this.K = (this.audioContext.sampleRate / 4) * this.r;
-        console.log(`K = ${this.K}`);
+        // console.log(`K = ${this.K}`);
       }
       this.node = this.audioContext.createScriptProcessor(4096, 0, 2);
-      console.log(`bufferSize = ${this.node.bufferSize}`);
+      // console.log(`bufferSize = ${this.node.bufferSize}`);
       this.node.onaudioprocess = event => this._onAudioProcess(event);
 
       this.gainNode = this.audioContext.createGain();
@@ -57,9 +53,9 @@ class Synth {
   }
 
   _onAudioProcess(event) {
-    let outputBuffer = event.outputBuffer;
+    const { outputBuffer } = event;
 
-    for (let s = 0; s < this.node.bufferSize; s++) {
+    for (let s = 0; s < this.node.bufferSize; s += 1) {
       const realFreq = BASE_FREQ * this.r;
       const angularFreq = realFreq * 2 * Math.PI;
 
@@ -68,8 +64,8 @@ class Synth {
       const sampleAngle = sampleTime * angularFreq;
 
       // Set current sample on all channels
-      for (var c = 0; c < outputBuffer.numberOfChannels; c++) {
-        let outputData = outputBuffer.getChannelData(c);
+      for (let c = 0; c < outputBuffer.numberOfChannels; c += 1) {
+        const outputData = outputBuffer.getChannelData(c);
 
         // Generate sample
         const [o, r, K] = this.generator(sampleAngle, this.r, this.K);
@@ -81,7 +77,7 @@ class Synth {
       }
 
       // Increment counter
-      this.t++;
+      this.t += 1;
     }
   }
 }

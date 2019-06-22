@@ -42,12 +42,13 @@ class SynthController extends React.Component {
 
 SynthController.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  audioContext: PropTypes.object.isRequired,
+  audioContext: PropTypes.object,
   isPlaying: PropTypes.bool,
   generator: PropTypes.func,
 };
 
 SynthController.defaultProps = {
+  audioContext: null,
   isPlaying: false,
   generator: () => {},
 };

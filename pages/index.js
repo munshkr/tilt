@@ -1,15 +1,14 @@
-import React from 'react';
-import Head from 'next/head';
-import dynamic from 'next/dynamic';
-import { withRouter } from 'next/router';
-import getConfig from 'next/config';
-
 import lzwCompress from 'lzwcompress';
-
+import getConfig from 'next/config';
+import dynamic from 'next/dynamic';
+import Head from 'next/head';
+import { withRouter } from 'next/router';
+import PropTypes from 'prop-types';
+import React from 'react';
 import Button from '../components/Button';
-import SynthController from '../components/SynthController';
-import Oscilloscope from '../components/Oscilloscope';
 import ErrorMessage from '../components/ErrorMessage';
+import Oscilloscope from '../components/Oscilloscope';
+import SynthController from '../components/SynthController';
 
 const { publicRuntimeConfig } = getConfig();
 const { assetPrefix } = publicRuntimeConfig;
@@ -25,9 +24,9 @@ const DEFAULT_CONTENT = `// Define variable o to set audio output, like this:
 o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 `;
 
-const PlayButton = props => <Button src={`static/play.svg`} {...props} />;
-const StopButton = props => <Button src={`static/stop.svg`} {...props} />;
-const ShareButton = props => <Button src={`static/share.svg`} {...props} />;
+const PlayButton = props => <Button src="static/play.svg" {...props} />;
+const StopButton = props => <Button src="static/stop.svg" {...props} />;
+const ShareButton = props => <Button src="static/share.svg" {...props} />;
 
 const prelude = `
   // constants
@@ -108,21 +107,43 @@ const prelude = `
   };
 `;
 
+const generateURL = (content) => {
+  const buf = lzwCompress.pack(content);
+  const code = btoa(buf);
+  return `${assetPrefix}/#v=${URL_VERSION}&c=${code}`;
+};
+
+const getHashStringParams = () => {
+  const query = window.location.hash;
+  return query
+    ? (/^[?#]/.test(query) ? query.slice(1) : query).split('&').reduce((params, param) => {
+      const newParams = Object.assign({}, params);
+      const [key, value] = param.split('=');
+      newParams[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+      return newParams;
+    }, {})
+    : {};
+};
+
+const getLastContent = () => localStorage.getItem('lastContent');
+
+const setLastContent = (content) => {
+  localStorage.setItem('lastContent', content);
+};
+
 class Index extends React.Component {
-  state = {
-    audioContext: null,
-    content: DEFAULT_CONTENT,
-    generator: null,
-    isPlaying: false,
-    isFlashing: false,
-    error: null,
-  };
-
-  editorRef = React.createRef();
-  synthRef = React.createRef();
-
   constructor(props) {
     super(props);
+
+    this.state = {
+      audioContext: null,
+      content: DEFAULT_CONTENT,
+      generator: null,
+      isPlaying: false,
+      isFlashing: false,
+      error: null,
+    };
+
     this._onEval = this._onEval.bind(this);
     this._onStop = this._onStop.bind(this);
     this._onChange = this._onChange.bind(this);
@@ -134,105 +155,29 @@ class Index extends React.Component {
   componentDidMount() {
     let content;
 
-    const query = this._getHashStringParams();
-    console.log(`query params = ${JSON.stringify(query)}`);
+    const query = getHashStringParams();
+    // console.log(`query params = ${JSON.stringify(query)}`);
 
     // If URL contains a "c" param, decode source code
     if (query.c) {
       content = this._decodeCode(query.c);
-      console.log('load code from query params');
+      // console.log('load code from query params');
     } else {
       // Otherwise, try to get last content from localStorage
-      content = this._getLastContent();
+      content = getLastContent();
     }
 
     // If any, set content
     if (content) {
-      console.log('found! set content');
-      this.setState({ content: content });
+      // console.log('found! set content');
+      this.setState({ content });
     }
   }
 
-  _decodeCode(code) {
-    try {
-      const buf = atob(code)
-        .split(',')
-        .map(parseFloat);
-      return lzwCompress.unpack(buf);
-    } catch (err) {
-      this.setState({ error: `(Invalid URL) ${err.message}` });
-    }
-  }
-
-  _getHashStringParams() {
-    const query = window.location.hash;
-    return query
-      ? (/^[?#]/.test(query) ? query.slice(1) : query).split('&').reduce((params, param) => {
-          let [key, value] = param.split('=');
-          params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
-          return params;
-        }, {})
-      : {};
-  }
-
-  _getLastContent() {
-    return localStorage.getItem('lastContent');
-  }
-
-  _setLastContent(content) {
-    localStorage.setItem('lastContent', content);
-  }
-
-  _tryEval(content) {
-    try {
-      // parameters
-      var t = 0;
-      var r = 1;
-      var K = 0;
-      // global variables and functions
-      var o = 0;
-      // content
-      eval(
-        `${prelude};
-        ${content}`,
-      );
-      return true;
-    } catch (err) {
-      this.setState({ error: err.message });
-      console.error(err);
-      return false;
-    }
-  }
-
-  play() {
-    let { audioContext } = this.state;
-    if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    this.setState({ audioContext: audioContext, isPlaying: true });
-  }
-
-  stop() {
-    if (this.state.isPlaying) {
-      this._flash();
-      this.setState({ isPlaying: false });
-    }
-  }
-
-  eval(content) {
-    if (this._tryEval(content)) {
-      var generator = null;
-      eval(`generator = (t, r, K) => {
-        let o = 0;
-        ${prelude};
-        ${content};
-        return [o, r, K];
-      }`);
-      this.setState({ generator: generator });
-      this._flash();
-      this.play();
-    }
-  }
+  _onChange = (text) => {
+    setLastContent(text);
+    this.setState({ content: text, error: null });
+  };
 
   _flash() {
     this.setState({ isFlashing: true });
@@ -258,29 +203,90 @@ class Index extends React.Component {
   }
 
   _onShareButtonClick() {
+    const { router } = this.props;
     const content = this._getEditorContent();
-    const url = this._generateURL(content);
-    this.props.router.replace(url, url, { shallow: true });
+    const url = generateURL(content);
+    router.replace(url, url, { shallow: true });
   }
 
-  _generateURL(content) {
-    const buf = lzwCompress.pack(content);
-    const code = btoa(buf);
-    return `${assetPrefix}/#v=${URL_VERSION}&c=${code}`;
+  play() {
+    let { audioContext } = this.state;
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    this.setState({ audioContext, isPlaying: true });
   }
 
-  _onChange = text => {
-    this._setLastContent(text);
-    this.setState({ content: text, error: null });
-  };
+  stop() {
+    const { isPlaying } = this.state;
+    if (isPlaying) {
+      this._flash();
+      this.setState({ isPlaying: false });
+    }
+  }
+
+  eval(content) {
+    if (this._tryEval(content)) {
+      const generator = null;
+      // eslint-disable-next-line no-eval
+      eval(`generator = (t, r, K) => {
+        let o = 0;
+        ${prelude};
+        ${content};
+        return [o, r, K];
+      }`);
+      this.setState({ generator });
+      this._flash();
+      this.play();
+    }
+  }
+
+  _tryEval(content) {
+    try {
+      // parameters
+      // eslint-disable-next-line no-unused-vars
+      const t = 0;
+      // eslint-disable-next-line no-unused-vars
+      const r = 1;
+      // eslint-disable-next-line no-unused-vars
+      const K = 0;
+      // global variables and functions
+      // eslint-disable-next-line no-unused-vars
+      const o = 0;
+      // content
+      // eslint-disable-next-line no-eval
+      eval(
+        `${prelude};
+        ${content}`,
+      );
+      return true;
+    } catch (err) {
+      this.setState({ error: err.message });
+      // console.error(err);
+      return false;
+    }
+  }
+
+  _decodeCode(code) {
+    try {
+      const buf = atob(code)
+        .split(',')
+        .map(parseFloat);
+      return lzwCompress.unpack(buf);
+    } catch (err) {
+      this.setState({ error: `(Invalid URL) ${err.message}` });
+      return null;
+    }
+  }
 
   _getEditorContent() {
-    const editor = this.editorRef.current.editor;
-    return editor.getValue();
+    return this.editor.props.content;
   }
 
   render() {
-    const { audioContext, isPlaying, generator, isFlashing } = this.state;
+    const {
+      audioContext, isPlaying, generator, isFlashing, content, error,
+    } = this.state;
 
     return (
       <div className={isFlashing ? 'flash' : ''}>
@@ -291,14 +297,18 @@ class Index extends React.Component {
         </Head>
 
         <Editor
-          editorRef={this.editorRef}
+          ref={(c) => {
+            this.editor = c;
+          }}
           onEval={this._onEval}
           onStop={this._onStop}
           onChange={this._onChange}
-          content={this.state.content}
+          content={content}
         />
         <SynthController
-          ref={this.synthRef}
+          ref={(c) => {
+            this.synth = c;
+          }}
           audioContext={audioContext}
           isPlaying={isPlaying}
           generator={generator}
@@ -310,58 +320,63 @@ class Index extends React.Component {
         </div>
 
         {audioContext ? (
-          <Oscilloscope
-            audioContext={audioContext}
-            synthRef={this.synthRef}
-            isPlaying={isPlaying}
-          />
+          <Oscilloscope audioContext={audioContext} synth={this.synth} isPlaying={isPlaying} />
         ) : (
           ''
         )}
-        {this.state.error ? <ErrorMessage message={this.state.error} /> : ''}
+        {error ? <ErrorMessage message={error} /> : ''}
 
-        <style global jsx>{`
-          body {
-            background-color: transparent;
-            margin: 0;
-          }
-        `}</style>
-        <style jsx>{`
-          .controls {
-            position: absolute;
-            right: 1.5em;
-            bottom: 1em;
-            z-index: 2;
-          }
+        <style global jsx>
+          {`
+            body {
+              background-color: transparent;
+              margin: 0;
+            }
+          `}
+        </style>
+        <style jsx>
+          {`
+            .controls {
+              position: absolute;
+              right: 1.5em;
+              bottom: 1em;
+              z-index: 2;
+            }
 
-          .flash {
-            -webkit-animation-name: flash-animation;
-            -webkit-animation-duration: 0.2s;
-            animation-name: flash-animation;
-            animation-duration: 0.2s;
-          }
+            .flash {
+              -webkit-animation-name: flash-animation;
+              -webkit-animation-duration: 0.2s;
+              animation-name: flash-animation;
+              animation-duration: 0.2s;
+            }
 
-          @-webkit-keyframes flash-animation {
-            from {
-              background: black;
+            @-webkit-keyframes flash-animation {
+              from {
+                background: black;
+              }
+              to {
+                background: default;
+              }
             }
-            to {
-              background: default;
-            }
-          }
 
-          @keyframes flash-animation {
-            from {
-              background: black;
+            @keyframes flash-animation {
+              from {
+                background: black;
+              }
+              to {
+                background: default;
+              }
             }
-            to {
-              background: default;
-            }
-          }
-        `}</style>
+          `}
+        </style>
       </div>
     );
   }
 }
+
+Index.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  router: PropTypes.object.isRequired,
+};
 
 export default withRouter(Index);

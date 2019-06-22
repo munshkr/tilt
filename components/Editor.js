@@ -12,11 +12,11 @@ const style = {
 };
 
 const Editor = ({
-  editorRef, content, onChange, onEval, onStop,
+  editor, content, onChange, onEval, onStop,
 }) => (
   <div>
     <AceEditor
-      ref={editorRef}
+      ref={editor}
       mode="javascript"
       theme="tomorrow"
       name="editor"
@@ -63,10 +63,10 @@ const Editor = ({
 );
 
 Editor.propTypes = {
-  editorRef: PropTypes.oneOfType([
+  editor: PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.shape({ current: PropTypes.instanceOf(AceEditor) }),
-  ]).isRequired,
+  ]),
   content: PropTypes.string,
   onChange: PropTypes.func,
   onEval: PropTypes.func,
@@ -74,6 +74,7 @@ Editor.propTypes = {
 };
 
 Editor.defaultProps = {
+  editor: null,
   content: '',
   onChange: null,
   onEval: null,

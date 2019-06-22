@@ -18,14 +18,14 @@ class Oscilloscope extends React.Component {
   }
 
   componentDidMount() {
-    const { synthRef, audioContext } = this.props;
+    const { synth, audioContext } = this.props;
 
     this.analyser = audioContext.createAnalyser();
     this.analyser.fftSize = FFT_SIZE;
 
     this.dataArray = new Float32Array(this.analyser.frequencyBinCount);
 
-    synthRef.current.connectToSynth(this.analyser);
+    synth.connectToSynth(this.analyser);
   }
 
   componentDidUpdate() {
@@ -42,11 +42,11 @@ class Oscilloscope extends React.Component {
   }
 
   componentWillUnmount() {
-    const { synthRef } = this.props;
+    const { synth } = this.props;
 
     cancelAnimationFrame(this.tickRafId);
     cancelAnimationFrame(this.drawRafId);
-    synthRef.current.disconnectFromSynth(this.analyser);
+    synth.disconnectFromSynth(this.analyser);
     this.analyser = null;
     this.dataArray = null;
   }
@@ -113,7 +113,7 @@ class Oscilloscope extends React.Component {
 }
 
 Oscilloscope.propTypes = {
-  synthRef: PropTypes.oneOfType([
+  synth: PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.shape({ current: PropTypes.instanceOf(SynthController) }),
   ]).isRequired,

@@ -12,9 +12,6 @@ class Oscilloscope extends React.Component {
     this.state = {
       isDrawing: false,
     };
-
-    this._tick = this._tick.bind(this);
-    this._draw = this._draw.bind(this);
   }
 
   componentDidMount() {
@@ -51,19 +48,12 @@ class Oscilloscope extends React.Component {
     this.dataArray = null;
   }
 
-  _updateCanvasSize() {
-    if (this.canvas) {
-      this.canvas.width = this.dataArray.length;
-      this.canvas.height = CANVAS_HEIGHT;
-    }
-  }
-
-  _tick() {
+  _tick = () => {
     this.analyser.getFloatTimeDomainData(this.dataArray);
     this.tickRafId = requestAnimationFrame(this._tick);
-  }
+  };
 
-  _draw() {
+  _draw = () => {
     if (!this.canvas) return;
 
     const ctx = this.canvas.getContext('2d');
@@ -82,6 +72,13 @@ class Oscilloscope extends React.Component {
     ctx.stroke();
 
     this.drawRafId = requestAnimationFrame(this._draw);
+  };
+
+  _updateCanvasSize() {
+    if (this.canvas) {
+      this.canvas.width = this.dataArray.length;
+      this.canvas.height = CANVAS_HEIGHT;
+    }
   }
 
   render() {

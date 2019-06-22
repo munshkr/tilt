@@ -143,13 +143,6 @@ class Index extends React.Component {
       isFlashing: false,
       error: null,
     };
-
-    this._onEval = this._onEval.bind(this);
-    this._onStop = this._onStop.bind(this);
-    this._onChange = this._onChange.bind(this);
-    this._onPlayButtonClick = this._onPlayButtonClick.bind(this);
-    this._onStopButtonClick = this._onStopButtonClick.bind(this);
-    this._onShareButtonClick = this._onShareButtonClick.bind(this);
   }
 
   componentDidMount() {
@@ -179,34 +172,34 @@ class Index extends React.Component {
     this.setState({ content: text, error: null });
   };
 
-  _flash() {
-    this.setState({ isFlashing: true });
-    setTimeout(() => this.setState({ isFlashing: false }), 500);
-  }
-
-  _onEval(editor) {
+  _onEval = (editor) => {
     const content = editor.getValue();
     this.eval(content);
-  }
+  };
 
-  _onStop() {
+  _onStop = () => {
     this.stop();
-  }
+  };
 
-  _onPlayButtonClick() {
+  _onPlayButtonClick = () => {
     const content = this._getEditorContent();
     this.eval(content);
-  }
+  };
 
-  _onStopButtonClick() {
+  _onStopButtonClick = () => {
     this.stop();
-  }
+  };
 
-  _onShareButtonClick() {
+  _onShareButtonClick = () => {
     const { router } = this.props;
     const content = this._getEditorContent();
     const url = generateURL(content);
     router.replace(url, url, { shallow: true });
+  };
+
+  _flash() {
+    this.setState({ isFlashing: true });
+    setTimeout(() => this.setState({ isFlashing: false }), 500);
   }
 
   play() {

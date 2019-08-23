@@ -16,7 +16,7 @@ always-increasing counter.
 For example, to make a sine wave at 440hz:
 
 ```javascript
-o = sin(t)
+o = sine(t)
 ```
 
 Evaluate code by pressing the Play button, or <kbd>Ctrl</kbd>+<kbd>Enter</kbd>
@@ -56,8 +56,8 @@ samples in a *cycle*. It is used to make *rhythm*. See the function `seq` or
 A more complex example, using some of the functions described below:
 
 ```javascript
-o = sin(t/(randInt(8,32)+1)) * expEnv(8,1) * 0.75
-o += sin(t/4 + sin(t/2.0001)) * invEnv(seq(16,8),seq(4,8)+1) * 0.75
+o = sine(t/(randInt(8,32)+1)) * expEnv(8,1) * 0.75
+o += sine(t/4 + sine(t/2.0001)) * invEnv(seq(16,8),seq(4,8)+1) * 0.75
 ```
 
 
@@ -73,7 +73,7 @@ ones implemented right now:
 
 * `pi`: Pi constant.
 * `abs(arg)`: Returns the absolute value of a number.
-* `sin(arg)`: Returns the sine of a number.
+* `sine(arg)`: Returns the sine of a number.
 * `floor(arg)`: Returns the largest integer less than or equal to a given
   number.
 * `ceil(arg)`: Returns the smallest integer greater than or equal to a given

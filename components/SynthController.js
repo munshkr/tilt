@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import Synth from './Synth';
+import PropTypes from "prop-types";
+import React from "react";
+import Synth from "./Synth";
 
 class SynthController extends React.Component {
   componentDidUpdate() {
@@ -44,13 +44,13 @@ SynthController.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   audioContext: PropTypes.object,
   isPlaying: PropTypes.bool,
-  generator: PropTypes.func,
+  generator: PropTypes.func
 };
 
 SynthController.defaultProps = {
   audioContext: null,
   isPlaying: false,
-  generator: () => {},
+  generator: () => {}
 };
 
 export default SynthController;

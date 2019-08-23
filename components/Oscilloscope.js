@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import SynthController from './SynthController';
+import PropTypes from "prop-types";
+import React from "react";
+import SynthController from "./SynthController";
 
 const FFT_SIZE = 2048;
 const CANVAS_HEIGHT = 400;
@@ -10,7 +10,7 @@ class Oscilloscope extends React.Component {
     super(props);
 
     this.state = {
-      isDrawing: false,
+      isDrawing: false
     };
   }
 
@@ -56,7 +56,7 @@ class Oscilloscope extends React.Component {
   _draw = () => {
     if (!this.canvas) return;
 
-    const ctx = this.canvas.getContext('2d');
+    const ctx = this.canvas.getContext("2d");
 
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.beginPath();
@@ -87,14 +87,14 @@ class Oscilloscope extends React.Component {
     return (
       <div>
         <canvas
-          ref={(c) => {
+          ref={c => {
             this.canvas = c;
           }}
         />
         <style jsx>
           {`
             canvas {
-              ${isPlaying ? '' : 'display: none'}
+              ${isPlaying ? "" : "display: none"}
               position: absolute;
               top: 0;
               left: 0;
@@ -112,15 +112,15 @@ class Oscilloscope extends React.Component {
 Oscilloscope.propTypes = {
   synth: PropTypes.oneOfType([
     PropTypes.func,
-    PropTypes.shape({ current: PropTypes.instanceOf(SynthController) }),
+    PropTypes.shape({ current: PropTypes.instanceOf(SynthController) })
   ]).isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   audioContext: PropTypes.object.isRequired,
-  isPlaying: PropTypes.bool,
+  isPlaying: PropTypes.bool
 };
 
 Oscilloscope.defaultProps = {
-  isPlaying: false,
+  isPlaying: false
 };
 
 export default Oscilloscope;

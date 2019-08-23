@@ -1,19 +1,17 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import AceEditor from 'react-ace';
+import React from "react";
+import PropTypes from "prop-types";
+import AceEditor from "react-ace";
 
-import 'brace/mode/javascript';
-import 'brace/theme/tomorrow';
+import "brace/mode/javascript";
+import "brace/theme/tomorrow";
 
 const style = {
-  width: '100vw',
-  height: '100vh',
-  backgroundColor: 'transparent',
+  width: "100vw",
+  height: "100vh",
+  backgroundColor: "transparent"
 };
 
-const Editor = ({
-  editor, content, onChange, onEval, onStop,
-}) => (
+const Editor = ({ editor, content, onChange, onEval, onStop }) => (
   <div>
     <AceEditor
       ref={editor}
@@ -31,22 +29,22 @@ const Editor = ({
       editorProps={{ $blockScrolling: true }}
       commands={[
         {
-          name: 'evaluate',
-          bindKey: { win: 'Ctrl-Enter', mac: 'Command-Enter' },
-          exec: onEval,
+          name: "evaluate",
+          bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
+          exec: onEval
         },
         {
-          name: 'stop',
-          bindKey: { win: 'Ctrl-.', mac: 'Command-.' },
-          exec: onStop,
-        },
+          name: "stop",
+          bindKey: { win: "Ctrl-.", mac: "Command-." },
+          exec: onStop
+        }
       ]}
       setOptions={{
         enableBasicAutocompletion: false,
         enableLiveAutocompletion: false,
         enableSnippets: false,
         showLineNumbers: false,
-        tabSize: 2,
+        tabSize: 2
       }}
     />
     <style jsx global>
@@ -65,20 +63,20 @@ const Editor = ({
 Editor.propTypes = {
   editor: PropTypes.oneOfType([
     PropTypes.func,
-    PropTypes.shape({ current: PropTypes.instanceOf(AceEditor) }),
+    PropTypes.shape({ current: PropTypes.instanceOf(AceEditor) })
   ]),
   content: PropTypes.string,
   onChange: PropTypes.func,
   onEval: PropTypes.func,
-  onStop: PropTypes.func,
+  onStop: PropTypes.func
 };
 
 Editor.defaultProps = {
   editor: null,
-  content: '',
+  content: "",
   onChange: null,
   onEval: null,
-  onStop: null,
+  onStop: null
 };
 
 export default Editor;

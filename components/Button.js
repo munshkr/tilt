@@ -1,14 +1,12 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-const Button = ({
-  src, disabled, onClick, onKeyPress,
-}) => (
+const Button = ({ src, disabled, onClick, onKeyPress }) => (
   <div>
     <div
       onClick={disabled ? null : onClick}
       onKeyPress={disabled ? null : onKeyPress}
-      className={`button ${disabled ? 'disabled' : ''}`}
+      className={`button ${disabled ? "disabled" : ""}`}
     />
     <style jsx>
       {`
@@ -34,13 +32,13 @@ Button.propTypes = {
   src: PropTypes.string.isRequired,
   disabled: PropTypes.bool,
   onClick: PropTypes.func,
-  onKeyPress: PropTypes.func,
+  onKeyPress: PropTypes.func
 };
 
 Button.defaultProps = {
   disabled: false,
   onClick: null,
-  onKeyPress: null,
+  onKeyPress: null
 };
 
 export default Button;

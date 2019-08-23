@@ -1,5 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
 const ErrorMessage = ({ message }) => (
   <div>
@@ -14,7 +14,7 @@ const ErrorMessage = ({ message }) => (
           left: 1em;
           bottom: 1em;
           padding: 0.25em;
-          font-family: Monaco, Menlo, 'Ubuntu Mono', Consolas, source-code-pro;
+          font-family: Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro;
           color: #fff;
           background-color: #f00;
           z-index: 1;
@@ -28,7 +28,7 @@ const ErrorMessage = ({ message }) => (
 );
 
 ErrorMessage.propTypes = {
-  message: PropTypes.string.isRequired,
+  message: PropTypes.string.isRequired
 };
 
 export default ErrorMessage;

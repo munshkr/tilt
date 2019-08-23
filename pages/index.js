@@ -1,23 +1,23 @@
-import lzwCompress from 'lzwcompress';
-import getConfig from 'next/config';
-import dynamic from 'next/dynamic';
-import Head from 'next/head';
-import { withRouter } from 'next/router';
-import PropTypes from 'prop-types';
-import React from 'react';
-import Button from '../components/Button';
-import ErrorMessage from '../components/ErrorMessage';
-import Oscilloscope from '../components/Oscilloscope';
-import SynthController from '../components/SynthController';
+import lzwCompress from "lzwcompress";
+import getConfig from "next/config";
+import dynamic from "next/dynamic";
+import Head from "next/head";
+import { withRouter } from "next/router";
+import PropTypes from "prop-types";
+import React from "react";
+import Button from "../components/Button";
+import ErrorMessage from "../components/ErrorMessage";
+import Oscilloscope from "../components/Oscilloscope";
+import SynthController from "../components/SynthController";
 
 const { publicRuntimeConfig } = getConfig();
 const { assetPrefix } = publicRuntimeConfig;
 
 const URL_VERSION = 1;
 
-const Editor = dynamic(() => import('../components/Editor'), {
+const Editor = dynamic(() => import("../components/Editor"), {
   ssr: false,
-  loading: () => <span>Loading...</span>,
+  loading: () => <span>Loading...</span>
 });
 
 const DEFAULT_CONTENT = `// Define variable o to set audio output, like this:
@@ -107,7 +107,7 @@ const prelude = `
   };
 `;
 
-const generateURL = (content) => {
+const generateURL = content => {
   const buf = lzwCompress.pack(content);
   const code = btoa(buf);
   return `${assetPrefix}/#v=${URL_VERSION}&c=${code}`;
@@ -116,19 +116,23 @@ const generateURL = (content) => {
 const getHashStringParams = () => {
   const query = window.location.hash;
   return query
-    ? (/^[?#]/.test(query) ? query.slice(1) : query).split('&').reduce((params, param) => {
-      const newParams = Object.assign({}, params);
-      const [key, value] = param.split('=');
-      newParams[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
-      return newParams;
-    }, {})
+    ? (/^[?#]/.test(query) ? query.slice(1) : query)
+        .split("&")
+        .reduce((params, param) => {
+          const newParams = Object.assign({}, params);
+          const [key, value] = param.split("=");
+          newParams[key] = value
+            ? decodeURIComponent(value.replace(/\+/g, " "))
+            : "";
+          return newParams;
+        }, {})
     : {};
 };
 
-const getLastContent = () => localStorage.getItem('lastContent');
+const getLastContent = () => localStorage.getItem("lastContent");
 
-const setLastContent = (content) => {
-  localStorage.setItem('lastContent', content);
+const setLastContent = content => {
+  localStorage.setItem("lastContent", content);
 };
 
 class Index extends React.Component {
@@ -141,7 +145,7 @@ class Index extends React.Component {
       generator: null,
       isPlaying: false,
       isFlashing: false,
-      error: null,
+      error: null
     };
   }
 
@@ -167,12 +171,12 @@ class Index extends React.Component {
     }
   }
 
-  _onChange = (text) => {
+  _onChange = text => {
     setLastContent(text);
     this.setState({ content: text, error: null });
   };
 
-  _onEval = (editor) => {
+  _onEval = editor => {
     const content = editor.getValue();
     this.eval(content);
   };
@@ -250,7 +254,7 @@ class Index extends React.Component {
       // eslint-disable-next-line no-eval
       eval(
         `${prelude};
-        ${content}`,
+        ${content}`
       );
       return true;
     } catch (err) {
@@ -263,7 +267,7 @@ class Index extends React.Component {
   _decodeCode(code) {
     try {
       const buf = atob(code)
-        .split(',')
+        .split(",")
         .map(parseFloat);
       return lzwCompress.unpack(buf);
     } catch (err) {
@@ -278,11 +282,16 @@ class Index extends React.Component {
 
   render() {
     const {
-      audioContext, isPlaying, generator, isFlashing, content, error,
+      audioContext,
+      isPlaying,
+      generator,
+      isFlashing,
+      content,
+      error
     } = this.state;
 
     return (
-      <div className={isFlashing ? 'flash' : ''}>
+      <div className={isFlashing ? "flash" : ""}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <meta charSet="utf-8" />
@@ -290,7 +299,7 @@ class Index extends React.Component {
         </Head>
 
         <Editor
-          ref={(c) => {
+          ref={c => {
             this.editor = c;
           }}
           onEval={this._onEval}
@@ -299,7 +308,7 @@ class Index extends React.Component {
           content={content}
         />
         <SynthController
-          ref={(c) => {
+          ref={c => {
             this.synth = c;
           }}
           audioContext={audioContext}
@@ -313,11 +322,15 @@ class Index extends React.Component {
         </div>
 
         {audioContext ? (
-          <Oscilloscope audioContext={audioContext} synth={this.synth} isPlaying={isPlaying} />
+          <Oscilloscope
+            audioContext={audioContext}
+            synth={this.synth}
+            isPlaying={isPlaying}
+          />
         ) : (
-          ''
+          ""
         )}
-        {error ? <ErrorMessage message={error} /> : ''}
+        {error ? <ErrorMessage message={error} /> : ""}
 
         <style global jsx>
           {`
@@ -369,7 +382,7 @@ class Index extends React.Component {
 
 Index.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  router: PropTypes.object.isRequired,
+  router: PropTypes.object.isRequired
 };
 
 export default withRouter(Index);

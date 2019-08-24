@@ -76,7 +76,7 @@ const prelude = `
   const seq = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
 
   // envelopes
-  const expEnv = (subdiv, curve, smooth) => {
+  const env = (subdiv, curve, smooth) => {
     if (typeof(smooth) === 'undefined') smooth = 0.05;
     var tp = t%(K/subdiv)/(K/subdiv);
     var mult = (tp <= smooth) ? (tp / smooth) : 1;

@@ -321,15 +321,6 @@ class Index extends React.Component {
           <ShareButton onClick={this._onShareButtonClick} />
         </div>
 
-        {audioContext ? (
-          <Oscilloscope
-            audioContext={audioContext}
-            synth={this.synth}
-            isPlaying={isPlaying}
-          />
-        ) : (
-          ""
-        )}
         {error ? <ErrorMessage message={error} /> : ""}
 
         <style global jsx>

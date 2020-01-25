@@ -145,7 +145,8 @@ class Index extends React.Component {
       generator: null,
       isPlaying: false,
       isFlashing: false,
-      error: null
+      error: null,
+      oscSupported: false
     };
   }
 
@@ -169,6 +170,8 @@ class Index extends React.Component {
       // console.log('found! set content');
       this.setState({ content });
     }
+
+    this.setState({ oscSupported: this._isOscSupported() });
   }
 
   _onChange = text => {
@@ -200,6 +203,16 @@ class Index extends React.Component {
     const url = generateURL(content);
     router.replace(url, url, { shallow: true });
   };
+
+  // eslint-disable-next-line class-methods-use-this
+  _isOscSupported() {
+    // Looks like iOS does not support something related to canvas...?
+    // FIXME: Understand which feature is neeeded for drawing canvas and check
+    // for that, instead of sniffing user agent...
+    const iOS =
+      !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+    return !iOS;
+  }
 
   _flash() {
     this.setState({ isFlashing: true });
@@ -287,7 +300,8 @@ class Index extends React.Component {
       generator,
       isFlashing,
       content,
-      error
+      error,
+      oscSupported
     } = this.state;
 
     return (
@@ -321,6 +335,15 @@ class Index extends React.Component {
           <ShareButton onClick={this._onShareButtonClick} />
         </div>
 
+        {oscSupported && audioContext ? (
+          <Oscilloscope
+            audioContext={audioContext}
+            synth={this.synth}
+            isPlaying={isPlaying}
+          />
+        ) : (
+          ""
+        )}
         {error ? <ErrorMessage message={error} /> : ""}
 
         <style global jsx>

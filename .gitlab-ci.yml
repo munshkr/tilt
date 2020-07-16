@@ -2,8 +2,8 @@ pages:
   image: node:10
   stage: deploy
   script:
-  - npm install
-  - npm run export
+  - yarn
+  - yarn export
   - mv out/ public/
   artifacts:
     paths:

@@ -1,8 +1,6 @@
-const withCSS = require('@zeit/next-css');
-
 const assetPrefix = process.env.NODE_ENV === 'production' ? '/tilt' : '';
 
-module.exports = withCSS({
+module.exports = {
   assetPrefix,
   publicRuntimeConfig: {
     assetPrefix,
@@ -20,4 +18,4 @@ module.exports = withCSS({
     });
     return config;
   },
-});
+};

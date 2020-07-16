@@ -24,9 +24,9 @@ const DEFAULT_CONTENT = `// Define variable o to set audio output, like this:
 o = ( ((t<<1)^((t<<1)+(t>>7)&t>>12))|t>>(4-(1^7&(t>>19)))|t>>7 ) %64/64
 `;
 
-const PlayButton = props => <Button src="static/play.svg" {...props} />;
-const StopButton = props => <Button src="static/stop.svg" {...props} />;
-const ShareButton = props => <Button src="static/share.svg" {...props} />;
+const PlayButton = props => <Button src="play.svg" {...props} />;
+const StopButton = props => <Button src="stop.svg" {...props} />;
+const ShareButton = props => <Button src="share.svg" {...props} />;
 
 const prelude = `
   // constants

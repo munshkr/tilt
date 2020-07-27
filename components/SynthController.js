@@ -3,12 +3,17 @@ import React from "react";
 import Synth from "./Synth";
 
 class SynthController extends React.Component {
-  componentDidUpdate() {
+  componentDidMount() {
+    this.nodesToConnect = [];
+  }
+
+  async componentDidUpdate() {
     const { audioContext, isPlaying, generator } = this.props;
 
     if (audioContext) {
       if (!this.synth) {
         this.synth = new Synth(audioContext);
+        await this.synth.loadWorkletModules();
       }
 
       if (isPlaying) {
@@ -24,8 +29,13 @@ class SynthController extends React.Component {
   }
 
   connectToSynth(node) {
-    if (this.synth) {
+    if (this.synth.gainNode) {
       this.synth.gainNode.connect(node);
+    } else {
+      this.synth.on("load", synth => {
+        console.log("connect oscilloscope");
+        synth.gainNode.connect(node);
+      });
     }
   }
 

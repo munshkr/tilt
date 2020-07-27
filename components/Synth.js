@@ -2,8 +2,11 @@ const BASE_FREQ = 440;
 
 class Synth {
   constructor(audioContext) {
-    this.isPlaying = false;
     this.audioContext = audioContext;
+
+    this.loaded = false;
+    this.isPlaying = false;
+    this.callbacks = {};
 
     this.K = null;
     this.gain = 0.5;
@@ -13,8 +16,24 @@ class Synth {
     this.generator = (t, r, K) => [0, r, K];
   }
 
+  on(event, cb) {
+    if (!this.callbacks[event]) this.callbacks[event] = [];
+    this.callbacks[event].push(cb);
+  }
+
+  emit(event, data) {
+    const cbs = this.callbacks[event];
+    if (cbs) {
+      cbs.forEach(cb => cb(data));
+    }
+  }
+
   _setGainTarget(targetValue) {
     this.gainNode.gain.setTargetAtTime(targetValue, this.audioContext.currentTime, 0.015);
+  }
+
+  async loadWorkletModules() {
+    await this.audioContext.audioWorklet.addModule("worklets/output-processor.js");
   }
 
   play() {
@@ -22,6 +41,7 @@ class Synth {
       this._initialize();
       this._setGainTarget(this.gain);
       this.isPlaying = true;
+      this.emit("play");
       // console.log('play');
     }
   }
@@ -30,6 +50,7 @@ class Synth {
     if (this.isPlaying) {
       this._setGainTarget(0);
       this.isPlaying = false;
+      this.emit("stop");
       // console.log('stop');
     }
   }
@@ -41,14 +62,19 @@ class Synth {
         this.K = (this.audioContext.sampleRate / 4) * this.r;
         // console.log(`K = ${this.K}`);
       }
-      this.node = this.audioContext.createScriptProcessor(4096, 0, 2);
-      // console.log(`bufferSize = ${this.node.bufferSize}`);
-      this.node.onaudioprocess = event => this._onAudioProcess(event);
 
       this.gainNode = this.audioContext.createGain();
       this.gainNode.value = this.gain;
-      this.node.connect(this.gainNode);
       this.gainNode.connect(this.audioContext.destination);
+
+      // this.node = this.audioContext.createScriptProcessor(4096, 0, 2);
+      this.node = new AudioWorkletNode(this.audioContext, "output-processor");
+      // this.node.onaudioprocess = event => this._onAudioProcess(event);
+      // console.log(`bufferSize = ${this.node.bufferSize}`);
+      this.node.connect(this.gainNode);
+
+      this.loaded = true;
+      this.emit("load", this);
     }
   }
 

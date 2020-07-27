@@ -67,13 +67,15 @@ const prelude = `
   const saw = arg => (arg % two_pi) / two_pi;
   const pulse = (arg, width) => (saw(arg) > (width || 0.5));
   const square = arg => pulse(arg, 0.5);
-  const triangle = arg => {
+  const tri = arg => {
     const r = saw(arg);
     return ((r > 0.5 ? r : (1 - r)) - 0.5)*2;
   };
 
   // sequences
-  const seq = (subdiv, length) => Math.floor(1+(t/(K/subdiv)%(length)));
+  const seq = (subdiv, length) => Math.floor(t/(K/subdiv)%length);
+  const seq1 = (subdiv, length) => seq(subdiv, length) + 1;
+  const aseq = (subdiv, array) => array[seq(subdiv, array.length)];
 
   // envelopes
   const env = (subdiv, curve, smooth) => {

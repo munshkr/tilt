@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "export": "yarn build && next export"
+    "export": "yarn build && next export",
+    "gh-deploy": "yarn export && yarn gh-pages -t -d out/"
   },
   "keywords": [],
   "author": "Damián Silvani",

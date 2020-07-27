@@ -26,7 +26,12 @@ jobs:
       uses: actions/setup-node@v2.1.1
 
     - name: Install dependencies
-      run: npm install
+      run: yarn install
+
+    - name: Setup Git credentials
+    - uses: oleksiyrudenko/gha-git-credentials@v1
+      with:
+        token: '${{ secrets.GITHUB_TOKEN }}'
 
     - name: Deploy to GitHub Pages
-      run: npm run gh-deploy
+      run: yarn gh-deploy

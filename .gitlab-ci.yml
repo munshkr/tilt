@@ -4,8 +4,9 @@ pages:
   script:
   - yarn
   - yarn export
+  - rm -rf public/ && mv out public
   artifacts:
     paths:
-    - out
+    - public
   only:
   - master

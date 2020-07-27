@@ -14,11 +14,7 @@ class Synth {
   }
 
   _setGainTarget(targetValue) {
-    this.gainNode.gain.setTargetAtTime(
-      targetValue,
-      this.audioContext.currentTime,
-      0.015
-    );
+    this.gainNode.gain.setTargetAtTime(targetValue, this.audioContext.currentTime, 0.015);
   }
 
   play() {

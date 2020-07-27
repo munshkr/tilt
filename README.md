@@ -59,9 +59,7 @@ A more complex example, using some of the functions described below:
 ```javascript
 o = sine(t / (randInt(8, 32) + 1)) * env(8, 1) * 0.75;
 o +=
-  sine(
-    (t * aseq(16, [2, 3, 2, 7, 8])) / 4 + sine((t / aseq(8, [1, 2])) * 1.0001)
-  ) *
+  sine((t * aseq(16, [2, 3, 2, 7, 8])) / 4 + sine((t / aseq(8, [1, 2])) * 1.0001)) *
   invEnv(seq1(32, 8), seq1(4, 8) + 1) *
   0.75;
 ```

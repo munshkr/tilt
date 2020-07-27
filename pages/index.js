@@ -118,16 +118,12 @@ const generateURL = content => {
 const getHashStringParams = () => {
   const query = window.location.hash;
   return query
-    ? (/^[?#]/.test(query) ? query.slice(1) : query)
-        .split("&")
-        .reduce((params, param) => {
-          const newParams = Object.assign({}, params);
-          const [key, value] = param.split("=");
-          newParams[key] = value
-            ? decodeURIComponent(value.replace(/\+/g, " "))
-            : "";
-          return newParams;
-        }, {})
+    ? (/^[?#]/.test(query) ? query.slice(1) : query).split("&").reduce((params, param) => {
+        const newParams = Object.assign({}, params);
+        const [key, value] = param.split("=");
+        newParams[key] = value ? decodeURIComponent(value.replace(/\+/g, " ")) : "";
+        return newParams;
+      }, {})
     : {};
 };
 
@@ -211,8 +207,7 @@ class Index extends React.Component {
     // Looks like iOS does not support something related to canvas...?
     // FIXME: Understand which feature is neeeded for drawing canvas and check
     // for that, instead of sniffing user agent...
-    const iOS =
-      !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+    const iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
     return !iOS;
   }
 
@@ -338,11 +333,7 @@ class Index extends React.Component {
         </div>
 
         {oscSupported && audioContext ? (
-          <Oscilloscope
-            audioContext={audioContext}
-            synth={this.synth}
-            isPlaying={isPlaying}
-          />
+          <Oscilloscope audioContext={audioContext} synth={this.synth} isPlaying={isPlaying} />
         ) : (
           ""
         )}

@@ -2,11 +2,11 @@ pages:
   image: node:10
   stage: deploy
   script:
-  - yarn
-  - yarn export
-  - rm -rf public/ && mv out public
+    - yarn
+    - yarn export
+    - rm -rf public/ && mv out public
   artifacts:
     paths:
-    - public
+      - public
   only:
-  - master
+    - master

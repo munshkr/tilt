@@ -7,8 +7,9 @@ import PropTypes from "prop-types";
 import React from "react";
 import Button from "../components/Button";
 import ErrorMessage from "../components/ErrorMessage";
-import Oscilloscope from "../components/Oscilloscope";
-import SynthController from "../components/SynthController";
+import OscilloscopeCanvas from "../components/OscilloscopeCanvas";
+import Oscilloscope from "../lib/Oscilloscope";
+import TiltSynth from "../lib/TiltSynth";
 
 const { publicRuntimeConfig } = getConfig();
 const { assetPrefix } = publicRuntimeConfig;
@@ -57,14 +58,15 @@ class Index extends React.Component {
     super(props);
 
     this.state = {
-      audioContext: null,
       content: DEFAULT_CONTENT,
-      evalCode: "",
       isPlaying: false,
       isFlashing: false,
       error: null,
       oscSupported: false
     };
+
+    this.editorRef = React.createRef();
+    this.canvasRef = React.createRef();
   }
 
   componentDidMount() {
@@ -72,15 +74,17 @@ class Index extends React.Component {
     this.checkOscilloscopeSupport();
   }
 
+  componentWillUnmount() {
+    if (this.oscillator) this.oscillator.release();
+  }
+
   getEditorContent() {
-    return this.editor.props.content;
+    return this.editorRef.current.editor.getValue();
   }
 
   handleEval = async editor => {
-    const evalCode = editor.getValue();
-    await this.setState({ evalCode }, () => {
-      this.play();
-    });
+    const code = editor.getValue();
+    this.eval(code);
   };
 
   handleStop = () => {
@@ -148,17 +152,47 @@ class Index extends React.Component {
     setTimeout(() => this.setState({ isFlashing: false }), 500);
   }
 
-  play() {
-    let { audioContext } = this.state;
-    if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  async initialize() {
+    console.log("initialize");
+    const { oscSupported } = this.state;
+
+    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    this.synth = new TiltSynth(this.audioContext);
+    await this.synth.loadWorkletModules();
+
+    if (oscSupported) {
+      this.oscilloscope = new Oscilloscope(this.audioContext);
+      this.oscilloscope.canvas = this.canvasRef.current;
+      this.oscilloscope.connectToSynth(this.synth);
+      this.oscilloscope.start();
     }
-    this.setState({ audioContext, isPlaying: true });
+  }
+
+  async play() {
+    console.log("play");
+    if (!this.synth) {
+      await this.initialize();
+    }
+    this.synth.play();
+    this.setState({ isPlaying: true });
+  }
+
+  async eval(code) {
+    console.log("eval");
+    if (!this.synth) {
+      await this.initialize();
+    }
+    this.synth.eval(code);
+    this.flash();
+    this.play();
   }
 
   stop() {
+    console.log("stop");
     const { isPlaying } = this.state;
     if (isPlaying) {
+      if (this.synth) this.synth.stop();
       this.flash();
       this.setState({ isPlaying: false });
     }
@@ -177,15 +211,7 @@ class Index extends React.Component {
   }
 
   render() {
-    const {
-      audioContext,
-      isPlaying,
-      evalCode,
-      isFlashing,
-      content,
-      error,
-      oscSupported
-    } = this.state;
+    const { isPlaying, isFlashing, content, error, oscSupported } = this.state;
 
     return (
       <div className={isFlashing ? "flash" : ""}>
@@ -196,33 +222,18 @@ class Index extends React.Component {
         </Head>
 
         <Editor
-          ref={c => {
-            this.editor = c;
-          }}
+          ref={this.editorRef}
           onEval={this.handleEval}
           onStop={this.handleStop}
           onChange={this.handleChange}
           content={content}
-        />
-        <SynthController
-          ref={c => {
-            this.synth = c;
-          }}
-          audioContext={audioContext}
-          isPlaying={isPlaying}
-          code={evalCode}
         />
         <div className="controls">
           <PlayButton onClick={this.handlePlayButtonClick} />
           <StopButton onClick={this.handleStopButtonClick} disabled={!isPlaying} />
           <ShareButton onClick={this.handleShareButtonClick} />
         </div>
-
-        {oscSupported && audioContext ? (
-          <Oscilloscope audioContext={audioContext} synth={this.synth} isPlaying={isPlaying} />
-        ) : (
-          ""
-        )}
+        {oscSupported && <OscilloscopeCanvas ref={this.canvasRef} isPlaying={isPlaying} />}
         {error ? <ErrorMessage message={error} /> : ""}
 
         <style global jsx>

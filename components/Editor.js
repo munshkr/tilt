@@ -11,10 +11,10 @@ const style = {
   backgroundColor: "transparent"
 };
 
-const Editor = ({ editor, content, onChange, onEval, onStop }) => (
-  <div>
+const Editor = React.forwardRef(({ content, onChange, onEval, onStop }, ref) => (
+  <>
     <AceEditor
-      ref={editor}
+      ref={ref}
       mode="javascript"
       theme="tomorrow"
       name="editor"
@@ -41,7 +41,7 @@ const Editor = ({ editor, content, onChange, onEval, onStop }) => (
       ]}
       setOptions={{
         enableBasicAutocompletion: false,
-        enableLiveAutocompletion: false,
+        enableLiveAutocompletion: true,
         enableSnippets: false,
         showLineNumbers: false,
         tabSize: 2
@@ -57,14 +57,10 @@ const Editor = ({ editor, content, onChange, onEval, onStop }) => (
         }
       `}
     </style>
-  </div>
-);
+  </>
+));
 
 Editor.propTypes = {
-  editor: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.instanceOf(AceEditor) })
-  ]),
   content: PropTypes.string,
   onChange: PropTypes.func,
   onEval: PropTypes.func,
@@ -72,7 +68,6 @@ Editor.propTypes = {
 };
 
 Editor.defaultProps = {
-  editor: null,
   content: "",
   onChange: null,
   onEval: null,

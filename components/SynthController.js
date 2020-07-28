@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import Synth from "../lib/Synth";
+import TiltSynth from "../lib/TiltSynth";
 
 class SynthController extends React.Component {
   componentDidMount() {
@@ -12,7 +12,7 @@ class SynthController extends React.Component {
 
     if (audioContext) {
       if (!this.synth) {
-        this.synth = new Synth(audioContext);
+        this.synth = new TiltSynth(audioContext);
         await this.synth.loadWorkletModules();
       }
 

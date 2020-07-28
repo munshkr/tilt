@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import Synth from "./Synth";
+import Synth from "../lib/Synth";
 
 class SynthController extends React.Component {
   componentDidMount() {

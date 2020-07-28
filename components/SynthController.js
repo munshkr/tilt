@@ -8,7 +8,7 @@ class SynthController extends React.Component {
   }
 
   async componentDidUpdate() {
-    const { audioContext, isPlaying, generator } = this.props;
+    const { audioContext, isPlaying, code } = this.props;
 
     if (audioContext) {
       if (!this.synth) {
@@ -17,13 +17,10 @@ class SynthController extends React.Component {
       }
 
       if (isPlaying) {
+        if (code) this.synth.eval(code);
         this.synth.play();
       } else {
         this.synth.stop();
-      }
-
-      if (generator) {
-        this.synth.generator = generator;
       }
     }
   }
@@ -33,7 +30,6 @@ class SynthController extends React.Component {
       this.synth.gainNode.connect(node);
     } else {
       this.synth.on("load", synth => {
-        console.log("connect oscilloscope");
         synth.gainNode.connect(node);
       });
     }
@@ -54,13 +50,13 @@ SynthController.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   audioContext: PropTypes.object,
   isPlaying: PropTypes.bool,
-  generator: PropTypes.func
+  code: PropTypes.string
 };
 
 SynthController.defaultProps = {
   audioContext: null,
   isPlaying: false,
-  generator: () => {}
+  code: ""
 };
 
 export default SynthController;

@@ -28,87 +28,6 @@ const PlayButton = props => <Button src="play.svg" {...props} />;
 const StopButton = props => <Button src="stop.svg" {...props} />;
 const ShareButton = props => <Button src="share.svg" {...props} />;
 
-const prelude = `
-  // constants
-  const pi = Math.PI;
-  const two_pi = 2 * pi;
-
-  // basic functions
-  const abs = Math.abs;
-  const acosh = Math.acosh;
-  const acos = Math.acos;
-  const asinh = Math.asinh;
-  const asin = Math.asin;
-  const atan2 = Math.atan2;
-  const atanh = Math.atanh;
-  const atan = Math.atan;
-  const cbrt = Math.cbrt;
-  const ceil = Math.ceil;
-  const cosh = Math.cosh;
-  const cos = Math.cos;
-  const exp = Math.exp;
-  const floor = Math.floor;
-  const log2 = Math.log2;
-  const log = Math.log;
-  const max = Math.max;
-  const min = Math.min;
-  const pow = Math.pow;
-  const round = Math.round;
-  const sign = Math.sign;
-  const sinh = Math.sinh;
-  const sin = Math.sin;
-  const sqrt = Math.sqrt;
-  const tanh = Math.tanh;
-  const tan = Math.tan;
-  const trunc = Math.trunc;
-
-  // waveforms
-  const sine = arg => (sin(arg) + 1) / 2;
-  const saw = arg => (arg % two_pi) / two_pi;
-  const pulse = (arg, width) => (saw(arg) > (width || 0.5));
-  const square = arg => pulse(arg, 0.5);
-  const tri = arg => {
-    const r = saw(arg);
-    return ((r > 0.5 ? r : (1 - r)) - 0.5)*2;
-  };
-
-  // sequences
-  const seq = (subdiv, length) => Math.floor(t/(K/subdiv)%length);
-  const seq1 = (subdiv, length) => seq(subdiv, length) + 1;
-  const aseq = (subdiv, array) => array[seq(subdiv, array.length)];
-
-  // envelopes
-  const env = (subdiv, curve, smooth) => {
-    if (typeof(smooth) === 'undefined') smooth = 0.05;
-    var tp = t%(K/subdiv)/(K/subdiv);
-    var mult = (tp <= smooth) ? (tp / smooth) : 1;
-    return Math.pow(1-tp, curve) * mult;
-  };
-  const invEnv = (subdiv, curve, smooth) => {
-    if (typeof(smooth) === 'undefined') smooth = 0.05;
-    var tp = t%(K/subdiv)/(K/subdiv);
-    var mult = (tp >= 1-smooth) ? ((1-tp) / smooth) : 1;
-    return Math.pow(tp, curve) * mult;
-  };
-
-  // randomness
-  const prime1 = 1120911527;
-  const prime2 = 341225299;
-  const prime3 = 3073422643;
-  const random = (n, seed) =>
-    (((n+seed)*(n+seed)*prime1 + (n+seed)*prime2) % prime3) / prime3;
-  const rand = (subdiv, seed) => {
-    if (typeof(subdiv) === 'undefined') subdiv = 1;
-    if (typeof(seed) === 'undefined') seed = 0;
-    const v = Math.floor(t / (K / subdiv));
-    return random(v, seed);
-  };
-  const randInt = (subdiv, max, seed) => {
-    max = Math.floor(max);
-    return Math.floor(rand(subdiv, seed) * max);
-  };
-`;
-
 const generateURL = content => {
   const buf = lzwCompress.pack(content);
   const code = btoa(buf);
@@ -140,7 +59,7 @@ class Index extends React.Component {
     this.state = {
       audioContext: null,
       content: DEFAULT_CONTENT,
-      generator: null,
+      evalCode: "",
       isPlaying: false,
       isFlashing: false,
       error: null,
@@ -177,9 +96,11 @@ class Index extends React.Component {
     this.setState({ content: text, error: null });
   };
 
-  _onEval = editor => {
-    const content = editor.getValue();
-    this.eval(content);
+  _onEval = async editor => {
+    const evalCode = editor.getValue();
+    await this.setState({ evalCode }, () => {
+      this.play();
+    });
   };
 
   _onStop = () => {
@@ -232,48 +153,6 @@ class Index extends React.Component {
     }
   }
 
-  eval(content) {
-    if (this._tryEval(content)) {
-      const generator = null;
-      // eslint-disable-next-line no-eval
-      eval(`generator = (t, r, K) => {
-        let o = 0;
-        ${prelude};
-        ${content};
-        return [o, r, K];
-      }`);
-      this.setState({ generator });
-      this._flash();
-      this.play();
-    }
-  }
-
-  _tryEval(content) {
-    try {
-      // parameters
-      // eslint-disable-next-line no-unused-vars
-      const t = 0;
-      // eslint-disable-next-line no-unused-vars
-      const r = 1;
-      // eslint-disable-next-line no-unused-vars
-      const K = 0;
-      // global variables and functions
-      // eslint-disable-next-line no-unused-vars
-      const o = 0;
-      // content
-      // eslint-disable-next-line no-eval
-      eval(
-        `${prelude};
-        ${content}`
-      );
-      return true;
-    } catch (err) {
-      this.setState({ error: err.message });
-      // console.error(err);
-      return false;
-    }
-  }
-
   _decodeCode(code) {
     try {
       const buf = atob(code)
@@ -294,7 +173,7 @@ class Index extends React.Component {
     const {
       audioContext,
       isPlaying,
-      generator,
+      evalCode,
       isFlashing,
       content,
       error,
@@ -324,7 +203,7 @@ class Index extends React.Component {
           }}
           audioContext={audioContext}
           isPlaying={isPlaying}
-          generator={generator}
+          code={evalCode}
         />
         <div className="controls">
           <PlayButton onClick={this._onPlayButtonClick} />

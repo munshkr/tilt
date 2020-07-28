@@ -1,12 +1,12 @@
+/* global sampleRate */
 /* eslint-disable lines-between-class-members */
 /* eslint-disable no-restricted-properties */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-vars */
 
-const BASE_FREQ = 440; // TODO should be a parameter
-const SAMPLE_RATE = 44100; // TODO should be a parameter
+const baseFreq = 440; // TODO should be a parameter
 
-const PRELUDE = `
+const prelude = `
   // constants
   const pi = Math.PI;
   const twoPi = 2 * pi;
@@ -73,7 +73,7 @@ class OutputProcessor extends AudioWorkletProcessor {
 
     this._t = 0;
     this._r = 1;
-    this._K = (SAMPLE_RATE / 4) * this._r;
+    this._K = (sampleRate / 4) * this._r;
 
     this._generator = (_t, r, K) => [0, r, K];
 
@@ -87,11 +87,11 @@ class OutputProcessor extends AudioWorkletProcessor {
     const bufferSize = output[0].length;
 
     for (let s = 0; s < bufferSize; s += 1) {
-      const realFreq = BASE_FREQ * this._r;
+      const realFreq = baseFreq * this._r;
       const angularFreq = realFreq * 2 * Math.PI;
 
       // Calculate value for generator
-      const sampleTime = this._t / SAMPLE_RATE;
+      const sampleTime = this._t / sampleRate;
       const sampleAngle = sampleTime * angularFreq;
 
       // Set current sample on all channels
@@ -117,7 +117,7 @@ class OutputProcessor extends AudioWorkletProcessor {
     const updateGeneratorJs = `
         this._generator = (t, r, K) => {
             let o = 0;
-            ${PRELUDE};
+            ${prelude};
             ${code};
             return [o, r, K];
         }

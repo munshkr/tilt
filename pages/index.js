@@ -68,6 +68,51 @@ class Index extends React.Component {
   }
 
   componentDidMount() {
+    this.loadContent();
+    this.checkOscilloscopeSupport();
+  }
+
+  getEditorContent() {
+    return this.editor.props.content;
+  }
+
+  handleEval = async editor => {
+    const evalCode = editor.getValue();
+    await this.setState({ evalCode }, () => {
+      this.play();
+    });
+  };
+
+  handleStop = () => {
+    this.stop();
+  };
+
+  handlePlayButtonClick = () => {
+    const content = this.getEditorContent();
+    this.eval(content);
+  };
+
+  handleStopButtonClick = () => {
+    this.stop();
+  };
+
+  handleChange = text => {
+    setLastContent(text);
+    this.setState({ content: text, error: null });
+  };
+
+  handleShareButtonClick = () => {
+    const { router } = this.props;
+    const content = this.getEditorContent();
+    const url = generateURL(content);
+    router.replace(url, url, { shallow: true });
+  };
+
+  checkOscilloscopeSupport() {
+    this.setState({ oscSupported: this.isOscSupported() });
+  }
+
+  loadContent() {
     let content;
 
     const query = getHashStringParams();
@@ -75,7 +120,7 @@ class Index extends React.Component {
 
     // If URL contains a "c" param, decode source code
     if (query.c) {
-      content = this._decodeCode(query.c);
+      content = this.decodeCode(query.c);
       // console.log('load code from query params');
     } else {
       // Otherwise, try to get last content from localStorage
@@ -87,44 +132,10 @@ class Index extends React.Component {
       // console.log('found! set content');
       this.setState({ content });
     }
-
-    this.setState({ oscSupported: this._isOscSupported() });
   }
 
-  _onChange = text => {
-    setLastContent(text);
-    this.setState({ content: text, error: null });
-  };
-
-  _onEval = async editor => {
-    const evalCode = editor.getValue();
-    await this.setState({ evalCode }, () => {
-      this.play();
-    });
-  };
-
-  _onStop = () => {
-    this.stop();
-  };
-
-  _onPlayButtonClick = () => {
-    const content = this._getEditorContent();
-    this.eval(content);
-  };
-
-  _onStopButtonClick = () => {
-    this.stop();
-  };
-
-  _onShareButtonClick = () => {
-    const { router } = this.props;
-    const content = this._getEditorContent();
-    const url = generateURL(content);
-    router.replace(url, url, { shallow: true });
-  };
-
   // eslint-disable-next-line class-methods-use-this
-  _isOscSupported() {
+  isOscSupported() {
     // Looks like iOS does not support something related to canvas...?
     // FIXME: Understand which feature is neeeded for drawing canvas and check
     // for that, instead of sniffing user agent...
@@ -132,7 +143,7 @@ class Index extends React.Component {
     return !iOS;
   }
 
-  _flash() {
+  flash() {
     this.setState({ isFlashing: true });
     setTimeout(() => this.setState({ isFlashing: false }), 500);
   }
@@ -148,12 +159,12 @@ class Index extends React.Component {
   stop() {
     const { isPlaying } = this.state;
     if (isPlaying) {
-      this._flash();
+      this.flash();
       this.setState({ isPlaying: false });
     }
   }
 
-  _decodeCode(code) {
+  decodeCode(code) {
     try {
       const buf = atob(code)
         .split(",")
@@ -163,10 +174,6 @@ class Index extends React.Component {
       this.setState({ error: `(Invalid URL) ${err.message}` });
       return null;
     }
-  }
-
-  _getEditorContent() {
-    return this.editor.props.content;
   }
 
   render() {
@@ -192,9 +199,9 @@ class Index extends React.Component {
           ref={c => {
             this.editor = c;
           }}
-          onEval={this._onEval}
-          onStop={this._onStop}
-          onChange={this._onChange}
+          onEval={this.handleEval}
+          onStop={this.handleStop}
+          onChange={this.handleChange}
           content={content}
         />
         <SynthController
@@ -206,9 +213,9 @@ class Index extends React.Component {
           code={evalCode}
         />
         <div className="controls">
-          <PlayButton onClick={this._onPlayButtonClick} />
-          <StopButton onClick={this._onStopButtonClick} disabled={!isPlaying} />
-          <ShareButton onClick={this._onShareButtonClick} />
+          <PlayButton onClick={this.handlePlayButtonClick} />
+          <StopButton onClick={this.handleStopButtonClick} disabled={!isPlaying} />
+          <ShareButton onClick={this.handleShareButtonClick} />
         </div>
 
         {oscSupported && audioContext ? (

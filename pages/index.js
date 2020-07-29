@@ -65,7 +65,6 @@ class Index extends React.Component {
       oscSupported: false
     };
 
-    this.editorRef = React.createRef();
     this.canvasRef = React.createRef();
   }
 
@@ -78,10 +77,6 @@ class Index extends React.Component {
     if (this.oscillator) this.oscillator.release();
   }
 
-  getEditorContent() {
-    return this.editorRef.current.editor.getValue();
-  }
-
   handleEval = async editor => {
     const code = editor.getValue();
     this.eval(code);
@@ -92,7 +87,7 @@ class Index extends React.Component {
   };
 
   handlePlayButtonClick = () => {
-    const content = this.getEditorContent();
+    const { content } = this.state;
     this.eval(content);
   };
 
@@ -107,7 +102,7 @@ class Index extends React.Component {
 
   handleShareButtonClick = () => {
     const { router } = this.props;
-    const content = this.getEditorContent();
+    const { content } = this.state;
     const url = generateURL(content);
     router.replace(url, url, { shallow: true });
   };
@@ -153,7 +148,6 @@ class Index extends React.Component {
   }
 
   async initialize() {
-    console.log("initialize");
     const { oscSupported } = this.state;
 
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -170,7 +164,6 @@ class Index extends React.Component {
   }
 
   async play() {
-    console.log("play");
     if (!this.synth) {
       await this.initialize();
     }
@@ -179,7 +172,6 @@ class Index extends React.Component {
   }
 
   async eval(code) {
-    console.log("eval");
     if (!this.synth) {
       await this.initialize();
     }
@@ -189,7 +181,6 @@ class Index extends React.Component {
   }
 
   stop() {
-    console.log("stop");
     const { isPlaying } = this.state;
     if (isPlaying) {
       if (this.synth) this.synth.stop();

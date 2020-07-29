@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import AceEditor from "react-ace";
 
@@ -6,60 +6,89 @@ import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-tomorrow";
 
-const style = {
-  width: "100vw",
-  height: "100vh",
-  backgroundColor: "transparent"
-};
+const Editor = ({ content, onChange, onEval, onStop }) => {
+  const style = {
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "transparent"
+  };
 
-const Editor = React.forwardRef(({ content, onChange, onEval, onStop }, ref) => (
-  <>
-    <AceEditor
-      ref={ref}
-      mode="javascript"
-      theme="tomorrow"
-      name="editor"
-      showGutter={false}
-      showPrintMargin={false}
-      wrapEnabled
-      fontSize={24}
-      focus
-      value={content}
-      style={style}
-      onChange={onChange}
-      editorProps={{ $blockScrolling: true }}
-      commands={[
-        {
-          name: "evaluate",
-          bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
-          exec: onEval
-        },
-        {
-          name: "stop",
-          bindKey: { win: "Ctrl-.", mac: "Command-." },
-          exec: onStop
-        }
-      ]}
-      setOptions={{
-        enableBasicAutocompletion: false,
-        enableLiveAutocompletion: true,
-        enableSnippets: false,
-        showLineNumbers: false,
-        tabSize: 2
-      }}
-    />
-    <style jsx global>
-      {`
-        .ace-tomorrow .ace_marker-layer .ace_active-line {
-          background: #efefefc0 !important;
-        }
-        .ace-tomorrow .ace_marker-layer .ace_selection {
-          background: #d6d6d6c0 !important;
-        }
-      `}
-    </style>
-  </>
-));
+  const staticWordCompleter = {
+    getCompletions: (_editor, _session, _pos, _prefix, callback) => {
+      const wordList = ["sine", "saw", "tri", "square", "pulse"];
+      callback(
+        null,
+        wordList.map(word => {
+          return {
+            caption: word,
+            value: word,
+            meta: "waveform"
+          };
+        })
+      );
+    }
+  };
+
+  const aceEditor = useRef(null);
+
+  useEffect(() => {
+    if (aceEditor.current) {
+      console.log("Set static word completer");
+      const { editor } = aceEditor.current;
+      editor.completers = [staticWordCompleter];
+    }
+  }, [aceEditor]);
+
+  return (
+    <>
+      <AceEditor
+        ref={aceEditor}
+        mode="javascript"
+        theme="tomorrow"
+        name="editor"
+        showGutter={false}
+        showPrintMargin={false}
+        wrapEnabled
+        fontSize={24}
+        focus
+        value={content}
+        style={style}
+        onChange={onChange}
+        editorProps={{ $blockScrolling: true }}
+        commands={[
+          {
+            name: "evaluate",
+            bindKey: { win: "Ctrl-Enter", mac: "Command-Enter" },
+            exec: onEval
+          },
+          {
+            name: "stop",
+            bindKey: { win: "Ctrl-.", mac: "Command-." },
+            exec: onStop
+          }
+        ]}
+        setOptions={{
+          useWorker: false,
+          enableBasicAutocompletion: false,
+          enableLiveAutocompletion: true,
+          enableSnippets: false,
+          showLineNumbers: false,
+          tabSize: 2
+        }}
+      />
+      <style jsx global>
+        {`
+          .ace-tomorrow .ace_marker-layer .ace_active-line {
+            background: #efefefc0 !important;
+          }
+          .ace-tomorrow .ace_marker-layer .ace_selection {
+            background: #d6d6d6c0 !important;
+          }
+        `}
+      </style>
+    </>
+  );
+};
 
 Editor.propTypes = {
   content: PropTypes.string,

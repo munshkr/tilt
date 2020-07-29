@@ -6,27 +6,69 @@ import "ace-builds/src-min-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-tomorrow";
 
+const staticWordCompleter = {
+  getCompletions: (_editor, _session, _pos, _prefix, callback) => {
+    const wordsByCategory = [
+      { name: "variables", words: ["t", "r", "K", "o"] },
+      { name: "constants", words: ["pi", "twoPi"] },
+      { name: "waveforms", words: ["sine", "saw", "tri", "square", "pulse"] },
+      {
+        name: "math-functions",
+        words: [
+          "abs",
+          "acosh",
+          "acos",
+          "asinh",
+          "asin",
+          "atan2",
+          "atanh",
+          "cbrt",
+          "ceil",
+          "cosh",
+          "cos",
+          "exp",
+          "floor",
+          "log2",
+          "log",
+          "max",
+          "min",
+          "pow",
+          "round",
+          "sign",
+          "sinh",
+          "sin",
+          "sqrt",
+          "tanh",
+          "tan",
+          "trunc"
+        ]
+      },
+      { name: "sequences", words: ["seq", "seq1", "aseq"] },
+      { name: "envelopes", words: ["env", "invEnv"] },
+      { name: "random", words: ["random", "rand", "randInt"] }
+    ];
+
+    const wordList = [];
+    wordsByCategory.forEach(category => {
+      const { words } = category;
+      wordList.push(
+        ...words.map(word => ({
+          caption: word,
+          value: word,
+          meta: category.name
+        }))
+      );
+    });
+
+    callback(null, wordList);
+  }
+};
+
 const Editor = ({ content, onChange, onEval, onStop }) => {
   const style = {
     width: "100vw",
     height: "100vh",
     backgroundColor: "transparent"
-  };
-
-  const staticWordCompleter = {
-    getCompletions: (_editor, _session, _pos, _prefix, callback) => {
-      const wordList = ["sine", "saw", "tri", "square", "pulse"];
-      callback(
-        null,
-        wordList.map(word => {
-          return {
-            caption: word,
-            value: word,
-            meta: "waveform"
-          };
-        })
-      );
-    }
   };
 
   const aceEditor = useRef(null);

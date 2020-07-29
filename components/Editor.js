@@ -9,11 +9,11 @@ import "ace-builds/src-noconflict/theme-tomorrow";
 const staticWordCompleter = {
   getCompletions: (_editor, _session, _pos, _prefix, callback) => {
     const wordsByCategory = [
-      { name: "variables", words: ["t", "r", "K", "o"] },
-      { name: "constants", words: ["pi", "twoPi"] },
-      { name: "waveforms", words: ["sine", "saw", "tri", "square", "pulse"] },
+      { name: "variable", words: ["t", "r", "K", "o"] },
+      { name: "constant", words: ["pi", "twoPi"] },
+      { name: "waveform", words: ["sine", "saw", "tri", "square", "pulse"] },
       {
-        name: "math-functions",
+        name: "math",
         words: [
           "abs",
           "acosh",
@@ -43,8 +43,8 @@ const staticWordCompleter = {
           "trunc"
         ]
       },
-      { name: "sequences", words: ["seq", "seq1", "aseq"] },
-      { name: "envelopes", words: ["env", "invEnv"] },
+      { name: "sequence", words: ["seq", "seq1", "aseq"] },
+      { name: "envelope", words: ["env", "invEnv"] },
       { name: "random", words: ["random", "rand", "randInt"] }
     ];
 

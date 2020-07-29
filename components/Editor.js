@@ -2,8 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import AceEditor from "react-ace";
 
-import "brace/mode/javascript";
-import "brace/theme/tomorrow";
+import "ace-builds/src-min-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/theme-tomorrow";
 
 const style = {
   width: "100vw",

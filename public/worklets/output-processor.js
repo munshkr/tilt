@@ -40,7 +40,6 @@ const prelude = `
     const mult = tp <= smooth ? tp / smooth : 1;
     return Math.pow(1 - tp, curve) * mult;
   };
-
   const invEnv = (subdiv, curve, smooth) => {
     if (typeof smooth === "undefined") smooth = 0.05;
     const tp = (t % (K / subdiv)) / (K / subdiv);
@@ -65,6 +64,10 @@ const prelude = `
     max = Math.floor(max);
     return Math.floor(rand(subdiv, seed) * max);
   };
+
+  // freq and midinote conversions
+  const f = freq => t*(freq/440);
+  const m = midinote => 2**((midinote-69)/12)*t;
 `;
 
 class OutputProcessor extends AudioWorkletProcessor {

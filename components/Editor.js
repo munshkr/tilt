@@ -10,10 +10,11 @@ const staticWordCompleter = {
   getCompletions: (_editor, _session, _pos, _prefix, callback) => {
     const wordsByCategory = [
       { name: "variable", words: ["t", "r", "K", "o"] },
+      { name: "time-function", words: ["f", "m"] },
       { name: "constant", words: ["pi", "twoPi"] },
-      { name: "waveform", words: ["sine", "saw", "tri", "square", "pulse"] },
+      { name: "waveform-function", words: ["sine", "saw", "tri", "square", "pulse"] },
       {
-        name: "math",
+        name: "math-function",
         words: [
           "abs",
           "acosh",
@@ -43,9 +44,9 @@ const staticWordCompleter = {
           "trunc"
         ]
       },
-      { name: "sequence", words: ["seq", "seq1", "aseq"] },
-      { name: "envelope", words: ["env", "invEnv"] },
-      { name: "random", words: ["random", "rand", "randInt"] }
+      { name: "sequence-function", words: ["seq", "seq1", "aseq"] },
+      { name: "envelope-function", words: ["env", "invEnv"] },
+      { name: "random-function", words: ["random", "rand", "randInt"] }
     ];
 
     const wordList = [];

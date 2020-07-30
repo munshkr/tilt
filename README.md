@@ -4,7 +4,6 @@ Bytebeat-inspired live coding thingie for waveshaping synthesis.
 
 Runs on modern browsers using the WebAudio API.
 
-
 ## Usage
 
 To make some audio, define the value of the variable `o`. It must be a number
@@ -134,7 +133,6 @@ audio output.
   `subdiv` subdivisions of a cycle, with an exponent `curve`. The optional
   `smooth` argument is a 0-1 number that splits the envelope into an increasing
   linear ramp for a smoother attack (0=no smoothing, 1=linear ramp).
-
 - `invEnv(subdiv, curve, smooth)`: Same as `env` but generates an inverse
   exponential envelope. The `smooth` argument controls a decreasing ramp at the
   end of the envelope.
@@ -144,16 +142,17 @@ audio output.
 - `rand(subdiv, seed)`: Returns a random number between 0 and 1. The number is
   held during `subdiv` subdivisions of a cycle. When using the same `seed` you
   can generate the same sequence of random numbers.
-
 - `randInt(subdiv, max, seed)`: Same as `rand` but generates a integer numbers
   from 0 to `max`.
 
-## Acknowledgments
+### Time
 
-- [Rampcode](https://github.com/gabochi/rampcode)
-- [Hydra](https://github.com/ojack/hydra)
-- The Computer Music Tutorial (Curtis Roads, 1996)
-- bytebeat _technique_ in general
+These functions generally replace the use of the `t` counter variable for musically-related concepts:
+
+- `f(frequency)`: Generates a counter at the specified frequency (e.g.
+  `sine(f(440)) == sine(t)`).
+- `m(midinote)`: Generates a counter at the specified MIDI note (e.g.
+  `sine(m(69)) == sine(t)`, because 69 is the A4, which is 440Hz).
 
 ## License
 

@@ -35,12 +35,14 @@ const prelude = `
 
   // envelopes
   const env = (subdiv, curve, smooth) => {
+    if (typeof curve === "undefined") curve = 1;
     if (typeof smooth === "undefined") smooth = 0.05;
     const tp = (t % (K / subdiv)) / (K / subdiv);
     const mult = tp <= smooth ? tp / smooth : 1;
     return Math.pow(1 - tp, curve) * mult;
   };
   const invEnv = (subdiv, curve, smooth) => {
+    if (typeof curve === "undefined") curve = 1;
     if (typeof smooth === "undefined") smooth = 0.05;
     const tp = (t % (K / subdiv)) / (K / subdiv);
     const mult = tp >= 1 - smooth ? (1 - tp) / smooth : 1;

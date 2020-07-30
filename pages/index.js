@@ -153,6 +153,9 @@ class Index extends React.Component {
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
     this.synth = new TiltSynth(this.audioContext);
+    this.synth.on("error", error => {
+      this.setState({ error: error.message });
+    });
     await this.synth.loadWorkletModules();
 
     if (oscSupported) {

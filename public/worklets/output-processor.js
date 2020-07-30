@@ -75,10 +75,17 @@ class OutputProcessor extends AudioWorkletProcessor {
     this._r = 1;
     this._K = (sampleRate / 4) * this._r;
 
+    this._generatorIsBroken = false;
+
     this._generator = (_t, r, K) => [0, r, K];
 
     this.port.onmessage = event => {
-      this._evaluate(event.data);
+      const { type, data } = event.data;
+      if (type === "code") {
+        this._evaluate(data);
+      } else {
+        console.error(`[output-processor] Unhandled error in processor: ${type}`);
+      }
     };
   }
 
@@ -115,16 +122,36 @@ class OutputProcessor extends AudioWorkletProcessor {
   // eslint-disable-next-line class-methods-use-this
   _evaluate(code) {
     const updateGeneratorJs = `
-        this._generator = (t, r, K) => {
-            let o = 0;
+      this._generator = (t, r, K) => {
+        let o = 0;
+
+        if (!this._generatorIsBroken) {
+          try {
             ${prelude};
             ${code};
-            return [o, r, K];
+          } catch (err) {
+            this._generatorIsBroken = true;
+            this._throwError(err);
+          }
         }
+
+        return [o, r, K];
+      }
     `;
 
-    // eslint-disable-next-line no-eval
-    eval(updateGeneratorJs);
+    this._generatorIsBroken = false;
+
+    try {
+      // eslint-disable-next-line no-eval
+      eval(updateGeneratorJs);
+    } catch (err) {
+      this._throwError(err);
+    }
+  }
+
+  _throwError(err) {
+    console.error("[output-processor] Exception:", err);
+    this.port.postMessage({ type: "error", data: err });
   }
 }
 

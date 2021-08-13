@@ -15,7 +15,7 @@
   "dependencies": {
     "ace-builds": "^1.4.12",
     "lzwcompress": "^0.4.0",
-    "next": "^9.4.4",
+    "next": "^11.1.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-ace": "8.0.0",

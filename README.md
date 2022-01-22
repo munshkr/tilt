@@ -4,6 +4,13 @@ Bytebeat-inspired live coding thingie for waveshaping synthesis.
 
 Runs on modern browsers using the WebAudio API.
 
+## Tutorial
+
+Check out the tutorial if you want to learn how to use Tilt while also learning a little bit about sound synthesis :-)
+
+* [English](tutorial.md)
+* [Español](tutorial.es.md)
+
 ## Usage
 
 To make some audio, define the value of the variable `o`. It must be a number
